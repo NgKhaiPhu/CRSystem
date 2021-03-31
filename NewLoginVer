@@ -1,0 +1,19 @@
+//Add a pointer pCur for easier managing 
+
+void login(Node* a,Node *& pCur) {
+	string u, p;
+	cout << "Username: ";
+	cin >> u;
+	cout << "Password: ";
+	cin >> p;
+
+	while (a != 0 && a->username != u)
+		a = a->nxt;
+	if (a != 0 && a->password == p)
+		cout << "Logged in\n";
+	else if (a != 0)
+		cout << "Sai mat khau\n";
+	else
+		cout << "Sai tai khoan\n";
+	pCur = a;
+}
