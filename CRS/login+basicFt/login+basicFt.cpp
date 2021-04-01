@@ -15,13 +15,12 @@ void inputAcc(fstream& acc, Node*& a);
 void login(Node* a, string& usn);
 void deleteList(Node*& a);
 void display(ifstream& ifs, string u);
+void changepass(fstream& fs, string u, Node* a);
 
 int main() {
-	
-	/*
 	Node* acc1 = 0;
 	fstream fs;
-	fs.open("testLogin.csv");
+	fs.open("testLogin.csv", ios::in | ios::out | ios::app);
 
 	if (!fs.is_open()) {
 		cout << "Cannot open file. " << endl;
@@ -44,11 +43,11 @@ int main() {
 	}
 
 	display(ifs, usn);	
+	changepass(fs, usn, acc1);
 
 	ifs.close();
 	deleteList(acc1);
 	return 0;
-	*/
 } 
 
 void display(ifstream& ifs, string u) {
@@ -69,9 +68,21 @@ void display(ifstream& ifs, string u) {
 	cout << "D.O.B: " << t << endl;
 }
 
-void changepass(string u) {
-	while (1);
-	//ve nha lam tiep
+void changepass(fstream& fs, string u, Node* a) {
+	Node* pC = a;
+	while (pC->username != u)
+		pC = pC->nxt;
+	cout << "Type your new password: ";
+	cin >> pC->password;
+
+	fs.open("testLogin.csv", ios::out);
+
+	while (a) {
+		fs << a->username << ',' << a->password << ',' << int(a->stt) << endl;
+		a = a->nxt;
+	}
+
+	fs.close();
 }
 
 void inputLL(Node*& a, Node*& pC, string t) {
@@ -86,12 +97,8 @@ void inputLL(Node*& a, Node*& pC, string t) {
 	}
 
 	getline(ss, pC->username, ',');
-	stringstream c(pC->username);
-	int check;
-	c >> check;
-	if (check != 0) pC->stt = 1;
-
-	getline(ss, pC->password);
+	getline(ss, pC->password, ',');
+	ss >> pC->stt;
 	pC->nxt = nullptr;
 }
 
