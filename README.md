@@ -23,7 +23,9 @@ Khi đã đăng nhập, user có thể xem profile cá nhân, đổi mật khẩ
 3.	Thêm các sinh viên năm nhất vào các lớp năm nhất.
 4.	Để input, nhân viên sẽ import 1 file CSV chứa các thông tin của tất cả học viên trong một lớp học cụ thể nào đó (thay vì gõ tay từng người một). Các thông tin bao gồm: STT, MSSV, tên, họ, giới tính, ngày sinh, CCCD.
 5.	Không cần thêm thông tin của sinh viên các năm học sau.
+
 Đầu học kỳ, một nhân viên sẽ:
+
 6.	Tạo học kỳ. Một năm học gồm ba loại học kỳ: HKI (thu), HKII (hè), HKIII (thu???????).  Chọn một loại học kỳ, năm học, ngày bắt đầu, kết thúc. Học kỳ được tạo mới sẽ trở thành học kỳ mặc định cho các chức năng bên dưới.
 7.	Tạo khung thời gian ĐKHP: ngày bắt đầu, kết thúc.
 8.	Thêm học phần cho học kỳ: mã học phần, tên học phần, tên giảng viên, số tín chỉ, sĩ số tối đa (mặc định 50), ngày học trong tuần và ca học (2/3/4/5/6/7, ca 1-07:30, ca 2-09:30, ca 3-13:30, ca 4-15:30). Một học phần được dạy trong 2 ca.
