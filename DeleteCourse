@@ -1,0 +1,38 @@
+void DeleteCourse(Sem& S, Course*& MyCo)
+{
+	if (MyCo == nullptr)
+	{
+		cout << "There are no courses available to delete!!! \n";
+		return;
+	}
+	Course* pC = S.C;
+	if(S.C!=nullptr) while (pC->nxt != nullptr) pC = pC->nxt;
+	int ID;
+	cout << "Input the Course ID that you want to delete. \n";
+	cout << "ID: ";
+	cin >> ID;
+	Course* pCur = MyCo;
+	while (pCur != nullptr && pCur->CoID != ID) pCur = pCur->nxt;
+	if (S.C == nullptr)
+	{
+		S.C = pCur;
+	}
+	else
+	{
+		Course* pC = S.C;
+		while (pC->nxt != nullptr) pC = pC->nxt;
+		pC->nxt = pCur;
+	}
+
+	if (pCur==MyCo)
+	{
+		MyCo = MyCo->nxt;
+	}
+	else
+	{
+		Course* pLink = MyCo;
+		while (pLink->nxt != pCur) pLink = pLink->nxt;
+		pLink->nxt = pC->nxt;
+	}
+	pCur->nxt = nullptr;
+}
