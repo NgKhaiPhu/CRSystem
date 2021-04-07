@@ -7,7 +7,9 @@ Hệ thống chia user làm 2 nhóm: sinh viên & nhân viên
 
 Ví dụ cho tên user của nhân viên:
 •	Ms. Le Thi Anh Thao
+
 •	Ms. Nguyen Thi Minh Phuc
+
 •	Ms. Hoang Thanh Tu
 
 Các sinh viên có thể đến từ các lớp APCS, CLC, VP,…
