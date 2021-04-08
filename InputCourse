@@ -1,0 +1,38 @@
+void InputCourse(fstream &f,Sem & MySem )
+{
+	int t;
+	Course* pcur = nullptr;
+	f>>MySem.sem ;
+	f >> MySem.regisStart;
+	f >> MySem.regisEnd;
+	f >> MySem.SemStart;
+	f >> MySem.SemEnd;
+	f >> t;
+	while (t != 0)
+	{
+		if (MySem.C == nullptr)
+		{
+			MySem.C = new Course;
+			pcur = MySem.C;
+		}
+		else
+		{
+			pcur->nxt = new Course;
+			pcur = pcur->nxt;
+		}
+		pcur->Dayofweek = new string[2];
+		pcur->S = new string[2];
+		pcur->stt=t;
+		f >> pcur->CoID;
+		f >> pcur->CoName;
+		f >> pcur->TeacherName;
+		f >> pcur->Credit;
+		f >> pcur->NumofStu;
+		f >> pcur->Dayofweek[0];
+		f >> pcur->S[0];
+		f >> pcur->Dayofweek[1];
+		f >> pcur->S[1];
+		pcur->nxt = nullptr;
+		f >> t;
+	}
+}

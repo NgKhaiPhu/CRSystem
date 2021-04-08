@@ -1,0 +1,52 @@
+void EnrollCourse(Sem S, Course *& MyCourse,int &ID) // S la hoc ki voi cac course dc staff nhap vao
+{
+	bool check;
+	if (S.C == nullptr)	return;
+	cout << "Please input the Course ID you want to enroll." << endl;
+	cout << "ID: ";
+	cin >> ID;
+	Course* pC = S.C;
+	while (pC!=nullptr && pC->CoID != ID) pC = pC->nxt;
+	if (MyCourse != nullptr)
+	{
+		Course* pCheck = MyCourse;
+		while (pCheck != nullptr)
+		{
+			for (int i=0;i<2;i++)
+				for(int j=0;j<2;j++)
+					if (pC->Dayofweek[i] == pCheck->Dayofweek[j])
+						if (pC->Session[i] == pCheck->Session[j]) 
+						{
+							check = false;
+							cout << " Enrollment fails. Session is conficted!" << endl;
+							return;
+						}
+		}
+	}
+	if(pC==nullptr)
+	{	
+		cout << "Wrong ID  !!!";
+		return;
+	}
+	Course* pcur = MyCourse;
+	if (MyCourse == nullptr)
+	{
+		MyCourse = pC;
+	}
+	else
+	{
+		while (pcur->nxt != nullptr ) pcur = pcur->nxt;
+		pcur->nxt = pC;
+	}
+	if (pC == S.C)
+	{
+		S.C = pC->nxt;
+	}
+	else
+	{
+		Course* pLink = S.C;
+		while (pLink->nxt != pC) pLink = pLink->nxt;
+		pLink->nxt = pC->nxt;
+	}
+	pC->nxt = nullptr;
+}
