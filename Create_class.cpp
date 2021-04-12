@@ -24,7 +24,6 @@ struct student
 	int social_id;
 	student* next;
 	string classes;
-	
 };
 
 struct staff
