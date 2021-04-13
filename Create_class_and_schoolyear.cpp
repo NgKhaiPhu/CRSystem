@@ -4,7 +4,6 @@
 #include<string>
 using namespace std;
 
-
 struct date 
 {
 	int day;
