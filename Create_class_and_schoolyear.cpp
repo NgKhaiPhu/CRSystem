@@ -140,6 +140,7 @@ void add_class_list(string* severalclass)
 	myfile.close();
 }
 
+
 void create_school_year()
 {
 	cout << "Enter the school year (yy-yy): "; int x; int y; cin >> x >> y;
