@@ -41,7 +41,6 @@ void import_list(student*& head, string* severalclass);
 void add_class_list(string* severalclass);
 void create_school_year();
 
-
 int main()
 {
 	student* list=nullptr;
