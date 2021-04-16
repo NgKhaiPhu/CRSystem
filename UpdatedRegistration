@@ -41,7 +41,13 @@ void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student);
 void DeleteACourse(Course*& pHead, int k);
 void InputAvailCourse(fstream& f, Sem& S, int& y, Course* MyCo);
 void EnrollCourse(Sem S, Course*& MyCourse, int& count);
-void EnrollCourse(Sem S, Course*& MyCourse, int& count);
+void ViewAvailableCourse(Sem S, int y);
+void ViewMyCourse(Sem S, int y, Course* MyCo);
+void DeleteCourse(Sem& S, Course*& MyCo, int& count);
+void OperateTask(Sem& S, Course*& MyCourse, int& y, int count);
+void DeleteList(Course*& MyCo, Sem& S);
+void StoreStuCourse(Course* MyCourse, fstream& f, int count, StuInfo Student);
+
 
 int main()
 {
@@ -64,7 +70,8 @@ int main()
 		OperateTask(Avail, MyCo, y,count);
 		fin.close();
 	}
-	DeleteCourse(Avail, MyCo,count);
+	DeleteList( MyCo,Avail);
+	StoreStuCourse(MyCo, fstu, count, Student);
 	return 0;
 }
 
@@ -158,7 +165,7 @@ void InputAvailCourse(fstream& f, Sem& S, int& y, Course* MyCo)
 		}
 		pcur->Dayofweek = new string[2];
 		pcur->Session = new string[2];
-		pcur->stt = t;
+		pcur->stt = t;	
 		f >> pcur->CoID;
 		f >> pcur->CoName;
 		f >> pcur->TeacherName;
