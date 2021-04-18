@@ -31,6 +31,7 @@ void create_courselist(Sem& se, Sem srr[], int& i, int& year);
 void displayCourseList(Sem se, Sem srr[], int i, int year);
 void deleteCourse(Sem& se, Sem srr[]);
 void read_data(Sem se, Sem srr[], int i, int year);
+void updateCourse(Sem &se, Sem srr[]);
 
 void TCmenu(Sem se, Sem srr[], int i, int year) {
     int option;
@@ -40,15 +41,16 @@ void TCmenu(Sem se, Sem srr[], int i, int year) {
         cout << "\t\t\t=          Press 0 to Endtask              =" << endl;
         cout << "\t\t\t=                1 to Create Courses       =" << endl;
         cout << "\t\t\t=                2 to Delete Courses       =" << endl;
-        cout << "\t\t\t=                3 to Display List         =" << endl;
+        cout << "\t\t\t=                3 to Update Course        =" << endl;
+        cout << "\t\t\t=                4 to Display List         =" << endl;
         cout << "\t\t\t============================================" << endl;
         cout << "\t\t\tOption => "; cin >> option;
         if (option == 1) { create_courselist(se, srr, i, year); }
         if (option == 2) { deleteCourse(se, srr); }
-        if (option == 3) { displayCourseList(se, srr, i, year); }
+        if (option == 3) { updateCourse(se, srr); }
+        if (option == 4) { displayCourseList(se, srr, i, year); }
     } while (option != 0);
 }
-
 
 
 void create_courselist(Sem& se, Sem srr[], int& i, int& year) {
@@ -133,7 +135,7 @@ void displayCourseList(Sem se, Sem srr[], int i, int year) {
     cout << setw(10) << left << "Credit";
     cout << setw(10) << left << "Maximum";
     cout << setw(12) << left << "Day";
-    cout << "Seassion";
+    cout << "Session";
     cout << endl;
     while (srr[i].cur != nullptr) {
         cout << setfill(' ');
@@ -189,7 +191,7 @@ void updateCourse(Sem &se, Sem srr[]){
     string idfake; cin>>idfake;
     srr[n].cur=srr[n].head;
     if (!srr[n].head) cout<<"\t\t\tList not available !";return;
-    if (srr[n].head->CoId!=ids){
+    if (srr[n].head->CoId!=idfake){
         while (srr[n].cur!=nullptr&&srr[n].cur->CoId!=idfake){
             srr[n].cur=srr[n].cur->next;
         }
@@ -197,29 +199,65 @@ void updateCourse(Sem &se, Sem srr[]){
     int op;
 
     do{
+        cout << endl;
         cout << "\t\t\t=====================================" << endl;
         cout << "\t\t\t=  which factor need to adjusted ?  =" << endl;
         cout << "\t\t\t=    Press  1  for  ID              =" << endl;
         cout << "\t\t\t=           2  for  NameCourse      =" << endl;
         cout << "\t\t\t=           3  for  Lecture         =" << endl;
         cout << "\t\t\t=           4  for  Credit          =" << endl;
-        cout << "\t\t\t=           4  for  MaxStudent      =" << endl;
-        cout << "\t\t\t=           5  for  Day of week     =" << endl;
-        cout << "\t\t\t=           6  for  Session of day  =" << endl;
-        cout << "\t\t\t=           7  for  ALL             =" << endl;
-        cout << "\t\t\t=           0  to Endtask           =" << endl;
+        cout << "\t\t\t=           5  for  MaxStudent      =" << endl;
+        cout << "\t\t\t=           6  for  Day of week     =" << endl;
+        cout << "\t\t\t=           7  for  Session of day  =" << endl;
+        cout << "\t\t\t=           8  for  ALL             =" << endl;
+        cout << "\t\t\t=           0  to   Endtask         =" << endl;
         cout << "\t\t\t=====================================" << endl;
         cin>>op;
         switch (op){
-            case 
+            case 1: cout << "\t\t\tnew ID: "; cin>>srr[n].cur->CoId;
+            case 2: cout << "\t\t\tnew NameCourse: "; cin.ignore(32767,'\n'); getline(cin, srr[n].cur->CoName);
+            case 3: cout << "\t\t\tnew Lecture: "; cin.ignore(32767,'\n'); getline(cin, srr[n].cur->CoName);
+            case 4: cout << "\t\t\tnew Credit: "; cin>>srr[n].cur->credit;
+            case 5: cout << "\t\t\tnew MaxStudent: "; cin>>srr[n].cur->maxSt;
+            case 6: cout << "\t\t\tnew Day of week"; 
+                            for (int i=0; i<2; i++) {
+                                cout<<"Day "<<i+1<<": ";
+                                cin>>srr[n].cur->day[i];
+                            }
+            case 7: cout << "\t\t\tnew Session of day"; 
+                            for (int i=0; i<2; i++) {
+                                cout<<"Session "<<i+1<<": ";
+                                cin>>srr[n].cur->s[i];
+                            }
+            case 8:
+                cout << "\t\t\tnew Id: ";
+                getline(cin, srr[n].cur->CoId);
+                cout << "\t\t\tnew Name: ";
+                getline(cin, srr[n].cur->CoName);
+                cout << "\t\t\tnew Teacher: ";
+                getline(cin, srr[n].cur->teacherName);
+                cout << "\t\t\tnew Credits: ";
+                cin >> srr[n].cur->credit;
+                cin.ignore(32767, '\n');
+                for (int j = 0; j < 2; j++) {
+                    cout << "\t\t\tnew Day " << j + 1 << ": ";
+                    getline(cin, srr[n].cur->day[j]);
+                }
+                for (int j = 0; j < 2; j++) {
+                    cout << "\t\t\tnew Session" << j + 1 << ": ";
+                    getline(cin, srr[n].cur->s[j]);
+                }
         }
-    }
-    
+    } while (op!=0);
 }
 
 
 
-int main(){
-    steadyGene();
+int main() {
+    int i;
+    int year;
+    Sem se;
+    Sem srr[3];
+    TCmenu(se, srr, i, year);
     return 0;
 }
