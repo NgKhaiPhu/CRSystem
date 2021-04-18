@@ -6,24 +6,16 @@ using namespace std;
 
 struct Course {
     int no;
-    string CoId;
-    string CoName;
-    string teacherName;
-    int credit;
-    int maxSt = 50;
-    string day[2];
-    string s[2];
+    string CoId, CoName, teacherName;
+    int credit, maxSt = 50;
+    string day[2], s[2];
     Course* next;
 };
 
 struct Sem {
-    string SemStart;
-    string SemEnd;
-    string regisStart;
-    string regisEnd;
+    string SemStart, SemEnd, regisStart, regisEnd;
     Course s;
-    Course* head = nullptr;
-    Course* cur = nullptr;
+    Course* head = nullptr, *cur = nullptr;
 };
 
 void TCmenu(Sem se, Sem srr[], int i, int year);
@@ -259,5 +251,6 @@ int main() {
     Sem se;
     Sem srr[3];
     TCmenu(se, srr, i, year);
+    cout << "helloworld";
     return 0;
 }
