@@ -13,7 +13,7 @@ struct StuInfo
 	char* LastName;
 	char Gender;
 	int day, month, year;
-	string SocialID;
+	long long int SocialID;
 };
 
 struct Course {
@@ -23,9 +23,11 @@ struct Course {
 	string TeacherName;
 	int Credit;
 	int NumofStu = 50;
+
 	string* Dayofweek;
 	string* Session;
 	Course* nxt;
+	StuofCourse *SofC;
 };
 
 struct Sem {
@@ -35,6 +37,13 @@ struct Sem {
 	string regisStart;
 	string regisEnd;
 	Course* C;
+};
+
+struct StuofCourse
+{
+	int StuEnroll;
+	StuInfo Stu;
+	StuofCourse* nxt;
 };
 
 void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student);
@@ -139,8 +148,10 @@ void DeleteACourse(Course*& pHead, int k)
 	}
 }
 
-void InputAvailCourse(fstream& f, Sem& S, int& y, Course* MyCo)
+void InputAvailCourse(fstream& f,fstream& fSoC, Sem& S, int& y, Course* MyCo)
 {
+	string filename;
+
 	y = 1;
 	int t;
 	Course* pcur = nullptr;
@@ -175,8 +186,38 @@ void InputAvailCourse(fstream& f, Sem& S, int& y, Course* MyCo)
 		f >> pcur->Session[0];
 		f >> pcur->Dayofweek[1];
 		f >> pcur->Session[1];
+		
+		filename = to_string(pcur->CoID) + ".txt";
+		fSoC.open(filename, fstream::in);
+		pcur->SofC = nullptr;
+		f >>  pcur->SofC->StuEnroll;
+		StuofCourse *ptmp ;
+		while (!fSoC.eof())
+		{
+			if (pcur->SofC == nullptr)
+			{
+				pcur->SofC = new StuofCourse;
+				ptmp = pcur->SofC;
+			}
+			else
+			{
+				ptmp->nxt = new StuofCourse;
+				ptmp = ptmp->nxt;
+			}
+			fSoC >> ptmp->Stu.No;
+			fSoC >> ptmp->Stu.StuID;
+			fSoC >> ptmp->Stu.FirstName;
+			fSoC >> ptmp->Stu.LastName;
+			fSoC >> ptmp->Stu.Gender;
+			fSoC >> ptmp->Stu.day;
+			fSoC >> ptmp->Stu.month;
+			fSoC >> ptmp->Stu.year;
+			fSoC >> ptmp->Stu.SocialID;
+			ptmp->nxt=nullptr;
+		}
 		pcur->nxt = nullptr;
 		f >> t;
+		fSoC.close();
 	}
 	while (MyCo->nxt != nullptr)
 	{
@@ -186,7 +227,7 @@ void InputAvailCourse(fstream& f, Sem& S, int& y, Course* MyCo)
 }
 void EnrollCourse(Sem S, Course*& MyCourse, int& count) // S la hoc ki voi cac course dc staff nhap vao
 {
-	if (count = 5)
+	if (count == 5)
 	{
 		cout << "You have met the limit of ernrollment course!!!" << endl;
 		return;
