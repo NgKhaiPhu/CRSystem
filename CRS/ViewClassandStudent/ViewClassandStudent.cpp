@@ -84,4 +84,6 @@ void ViewStudentofClass(student* head) {
 		classfile >> display;
 		classfile >> display;
 	}	
+	myfile.close();
+	classfile.close();
 }
