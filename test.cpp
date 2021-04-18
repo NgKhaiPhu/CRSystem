@@ -6,8 +6,8 @@ struct Course{
     string teacherName;
     int credit;
     int maxSt = 50;
-    string day;
-    string s[5];
+    string day[2];
+    string s[2];
     Course*next;
 };
 struct Sem{
