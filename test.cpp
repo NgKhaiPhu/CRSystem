@@ -16,7 +16,6 @@ struct Sem{
     string SemEnd;
     string regisStart;
     string regisEnd;
-    Course s;
     Course*head=nullptr;
     Course*cur=nullptr;
 };
