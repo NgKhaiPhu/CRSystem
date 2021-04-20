@@ -132,6 +132,7 @@ void create_class(student*& head)
 	myfile1.close();
 }
 
+
 void add_class_list(string* severalclass)
 {
 	fstream myfile;
