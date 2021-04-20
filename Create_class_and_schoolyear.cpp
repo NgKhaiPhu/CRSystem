@@ -99,7 +99,6 @@ void import_list(student*& head, string* severalclass)
 	myfile.close();
 }
 
-
 void create_class(student*& head)
 {
 	string severalclass;
