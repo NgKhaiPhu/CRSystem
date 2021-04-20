@@ -48,6 +48,7 @@ int main()
 	create_class(list);
 }
 
+
 bool check_file_exist(string* file)
 {
 	fstream myfile;
