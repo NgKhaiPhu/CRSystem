@@ -6,20 +6,20 @@ using namespace std;
 
 struct date 
 {
-	int day;
-	int month;
-	int year;
+	int day, 
+		month, 
+		year;
 };
 
 struct student
 {
-	int no;
-	int id;
-	string firstname;
-	string lastname;
-	string password;
-	string sclass;
-	string gender;
+	int no,
+		id;
+	string firstname, 
+		   lastname, 
+		   password, 
+		   sclass, 
+		   gender;
 	const int type = 0;
 	int socialid;
 	student* next;
@@ -28,10 +28,10 @@ struct student
 
 struct staff
 {
-	string fullname;
-	string gender;
-	string password;
-	string username;
+	string fullname,
+		   gender, 
+		   password, 
+		   username;
 	const int type = 1;
 };
 
@@ -43,7 +43,7 @@ void create_school_year();
 
 int main()
 {
-	student* list=nullptr;
+	student* list = nullptr;
 	create_school_year();
 	create_class(list);
 }
@@ -53,8 +53,10 @@ bool check_file_exist(string* file)
 {
 	fstream myfile;
 	myfile.open(*file, fstream::in);
-	if (myfile.is_open())  return true;
-	else return false;
+	if (myfile.is_open())
+		return true;
+	else 
+		return false;
 	myfile.close();
 }
 
@@ -62,10 +64,12 @@ void import_list(student*& head, string* severalclass)
 {
 	string fast_input;
 	cout << "Enter the address of your file for fast input: "; cin >> fast_input;
-	if (!check_file_exist(&fast_input)) { cout << "This file is not exist." << endl; return; }
+	if (!check_file_exist(&fast_input)) { 
+		cout << "This file is not exist." << endl;
+		return;
+	}
 	fstream myfile;
 	myfile.open(fast_input, fstream::in);
-
 	student* current = nullptr;
 	char temp;
 	while (!myfile.eof())
@@ -105,7 +109,10 @@ void create_class(student*& head)
 	while (getchar() != '\n');
 	cout << "Enter the class:"; getline(cin, severalclass);
 	string temp = severalclass + ".txt";
-	if (check_file_exist(&temp)) { cout << "The class " << severalclass << " is exist." << endl; return; }
+	if (check_file_exist(&temp)) {
+		cout << "The class " << severalclass << " is exist." << endl;
+		return;
+	}
 	import_list(head, &severalclass);
 	add_class_list(&severalclass);
 	fstream myfile, myfile1;
