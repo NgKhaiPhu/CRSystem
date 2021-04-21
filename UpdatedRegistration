@@ -41,48 +41,10 @@ struct Sem {
 
 struct StuofCourse
 {
-	int StuEnroll;
+	int StuEnroll;//num of Students enrolling to course right now;
 	StuInfo Stu;
 	StuofCourse* nxt;
 };
-
-void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student);
-void DeleteACourse(Course*& pHead, int k);
-void InputAvailCourse(fstream& f, Sem& S, int& y, Course* MyCo);
-void EnrollCourse(Sem S, Course*& MyCourse, int& count);
-void ViewAvailableCourse(Sem S, int y);
-void ViewMyCourse(Sem S, int y, Course* MyCo);
-void DeleteCourse(Sem& S, Course*& MyCo, int& count);
-void OperateTask(Sem& S, Course*& MyCourse, int& y, int count);
-void DeleteList(Course*& MyCo, Sem& S);
-void StoreStuCourse(Course* MyCourse, fstream& f, int count, StuInfo Student);
-
-
-int main()
-{
-	StuInfo Student;
-	int count = 0;
-	Sem Avail;
-	Course* MyCo;
-	fstream fin,fstu;
-	fin.open("AvailCourse.txt", fstream::in);
-	int y;
-	if (fin.fail())
-	{
-		cout << "Can't open the file !!!";
-		return 0;
-	}
-	else
-	{
-		InputMyCourse(fstu, MyCo, count,Student );
-		InputAvailCourse(fin, Avail, y, MyCo);
-		OperateTask(Avail, MyCo, y,count);
-		fin.close();
-	}
-	DeleteList( MyCo,Avail);
-	StoreStuCourse(MyCo, fstu, count, Student);
-	return 0;
-}
 
 void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student)
 {
@@ -124,28 +86,6 @@ void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student)
 		count--;
 	}
 	f.close();
-}
-
-void DeleteACourse(Course*& pHead, int k)
-{
-	if (pHead == nullptr) return;
-
-	Course* pCur = pHead;
-	if (pHead->stt == k) {
-		pHead = pHead->nxt;
-		delete pCur;
-		return;
-	}
-
-	while (pCur->nxt != nullptr) {
-		if (pCur->nxt->stt == k) {
-			Course* temp = pCur->nxt;
-			pCur->nxt = pCur->nxt->nxt;
-			delete temp;
-			return;
-		}
-		pCur = pCur->nxt;
-	}
 }
 
 void InputAvailCourse(fstream& f,fstream& fSoC, Sem& S, int& y, Course* MyCo)
@@ -221,11 +161,12 @@ void InputAvailCourse(fstream& f,fstream& fSoC, Sem& S, int& y, Course* MyCo)
 	}
 	while (MyCo->nxt != nullptr)
 	{
-		DeleteACourse(S.C, MyCo->stt);
+		RemoveAlreadyCourses(S.C, MyCo->stt);
 		MyCo = MyCo->nxt;
 	}
 }
-void EnrollCourse(Sem S, Course*& MyCourse, int& count) // S la hoc ki voi cac course dc staff nhap vao
+
+void EnrollCourse(Sem S, Course*& MyCourse, int& count,StuInfo Student) // S la hoc ki voi cac course dc staff nhap vao
 {
 	if (count == 5)
 	{
@@ -282,8 +223,28 @@ void EnrollCourse(Sem S, Course*& MyCourse, int& count) // S la hoc ki voi cac c
 		pLink->nxt = pC->nxt;
 	}
 	pC->nxt = nullptr;
+	AddStutoCourse(pC,Student);
 	count++;
 }
+
+void AddStutoCourse(Course* MyCo, StuInfo Student)
+{
+	StuofCourse* pCur = MyCo->SofC;
+	while (pCur->nxt != nullptr)	pCur = pCur->nxt;
+	pCur->nxt = new StuofCourse;
+	pCur = pCur->nxt;
+	pCur->StuEnroll++;
+	pCur->Stu.StuID = Student.StuID;
+	pCur->Stu.day = Student.day;
+	pCur->Stu.FirstName = Student.FirstName;
+	pCur->Stu.LastName= Student.LastName;
+	pCur->Stu.Gender = Student.Gender;
+	pCur->Stu.month = Student.month;
+	pCur->Stu.year = Student.year;
+	pCur->Stu.SocialID = Student.SocialID;
+	pCur->Stu.No = Student.No;
+}
+
 void ViewAvailableCourse(Sem S, int y)
 {
 	cout << setfill(' ');
@@ -313,6 +274,26 @@ void ViewAvailableCourse(Sem S, int y)
 		cout << endl << setw(89) << pC->Dayofweek[1];
 		cout << endl << setw(15) << pC->Session[1];
 		pC = pC->nxt;
+	}
+}
+
+void RemoveAlreadyCourses(Course*& pHead, int k)
+{
+	if (pHead == nullptr) return;
+	Course* pCur = pHead;
+	if (pHead->stt == k) {
+		pHead = pHead->nxt;
+		delete pCur;
+		return;
+	}
+	while (pCur->nxt != nullptr) {
+		if (pCur->nxt->stt == k) {
+			Course* temp = pCur->nxt;
+			pCur->nxt = pCur->nxt->nxt;
+			delete temp;
+			return;
+		}
+		pCur = pCur->nxt;
 	}
 }
 
@@ -389,7 +370,7 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count)
 	count--;
 }
 
-void OperateTask(Sem& S, Course*& MyCourse, int& y,int count)
+void OperateTask(Sem& S, Course*& MyCourse, int& y,int count,StuInfo Student)
 {
 	int option = 1;
 	while (option != 4)
@@ -408,7 +389,7 @@ void OperateTask(Sem& S, Course*& MyCourse, int& y,int count)
 		case 1:
 		{
 			ViewAvailableCourse(S, y);
-			EnrollCourse(S, MyCourse,count);
+			EnrollCourse(S, MyCourse,count,Student);
 			break;
 		}
 		case 2:
@@ -470,4 +451,30 @@ void StoreStuCourse(Course* MyCourse, fstream& f, int count, StuInfo Student)
 		count--;
 	}
 
+}
+
+int main()
+{
+	StuInfo Student;
+	int count = 0;
+	Sem Avail;
+	Course* MyCo;
+	fstream fin, fstu, fSoC;
+	fin.open("AvailCourse.txt", fstream::in);
+	int y;
+	if (fin.fail())
+	{
+		cout << "Can't open the file !!!";
+		return 0;
+	}
+	else
+	{
+		InputMyCourse(fstu, MyCo, count, Student);
+		InputAvailCourse(fin, fSoC, Avail, y, MyCo);
+		OperateTask(Avail, MyCo, y, count, Student);
+		fin.close();
+	}
+	DeleteList(MyCo, Avail);
+	StoreStuCourse(MyCo, fstu, count, Student);
+	return 0;
 }
