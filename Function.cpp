@@ -58,6 +58,11 @@ void deleteList(student*& a);
 void display(ifstream& ifs, string u);
 void changepass(fstream& fs, string u, student* a);
 
+//realtime
+void takeRealTime(string SemStart, string SemEnd, string ReStart, string ReEnd);
+bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int* year);
+bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, int* hour, int* min);
+
 //1
 bool check_file_exist(string* file);
 void create_class(student*& head);
