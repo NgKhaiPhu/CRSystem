@@ -1,0 +1,108 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+struct Course {
+	int CoID;
+	int stt;
+	string CoName;
+	string TeacherName;
+	int Credit;
+	int NumofStu = 50;
+	string* Dayofweek;
+	string* Session;
+	Course* nxt;
+};
+
+struct Sem {
+	int sem;
+	string SemStart;
+	string SemEnd;
+	Course* C;
+}; 
+
+struct StuInfo
+{
+	int No;
+	int StuID;
+	char* FirstName;
+	char* LastName;
+	char Gender;
+	int day, month, year;
+	long long int SocialID;
+};
+
+void InputMyCourse(fstream& f, Sem S, int& n, StuInfo Student)
+{
+	string filename;
+	filename = to_string(Student.StuID) + ".txt";
+	f.open(filename, fstream::in);
+	int count = n;
+	Course* pcur = S.C;
+	if (f.fail())
+	{
+		cout << "Can't open Student's Courses file.\n";
+		return;
+	}
+	while (count <= 0)
+	{
+		if (S.C == nullptr)
+		{
+			S.C = new Course;
+			pcur = S.C;
+		}
+		else
+		{
+			pcur->nxt = new Course;
+			pcur = pcur->nxt;
+		}
+		pcur->Dayofweek = new string[2];
+		pcur->Session = new string[2];
+		f >> pcur->stt;
+		f >> pcur->CoID;
+		f >> pcur->CoName;
+		f >> pcur->TeacherName;
+		f >> pcur->Credit;
+		f >> pcur->NumofStu;
+		f >> pcur->Dayofweek[0];
+		f >> pcur->Session[0];
+		f >> pcur->Dayofweek[1];
+		f >> pcur->Session[1];
+		pcur->nxt = nullptr;
+		count--;
+	}
+	f.close();
+}
+
+void ViewMyCourseAfterRegistrationOver(Sem S, int y)
+{
+	cout << setfill(' ');
+	cout << "Course List of Sem " << S.sem + 1 << " in the year of " << y << " ,which from ";
+	cout << S.SemStart << " to " << S.SemEnd << endl;
+	cout << "==========================================================================================" << endl;
+	cout << setw(5) << "ID";
+	cout << setw(15) << "Name";
+	cout << setw(15) << "Teacher";
+	cout << setw(5) << "Credit";
+	cout << setw(5) << "Maximum";
+	cout << setw(15) << "Day";
+	cout << setw(15) << "Sesson";
+	if (S.C == nullptr) return;
+	Course* pC = S.C;
+	while (pC != nullptr)
+	{
+		cout << endl;
+		cout << setw(5) << pC->CoID;
+		cout << setw(15) << pC->CoName;
+		cout << setw(15) << pC->TeacherName;
+		cout << setw(5) << pC->Credit;
+		cout << setw(5) << pC->NumofStu;
+		cout << setw(15) << pC->Dayofweek[0];
+		cout << setw(15) << pC->Session[0];
+		cout << endl << setw(89) << pC->Dayofweek[1];
+		cout << endl << setw(15) << pC->Session[1];
+		pC = pC->nxt;
+	}
+}
