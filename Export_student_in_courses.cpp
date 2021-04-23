@@ -28,6 +28,7 @@ struct student
 	date dob;
 };
 
+// Thieu Ham Lay Du Lieu Tu File Course Class vo Linked List
 void export_student_in_courses(student* head, string course_class)
 {
 	
