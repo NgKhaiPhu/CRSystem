@@ -330,7 +330,7 @@ void ViewMyCourse(Sem S, int y, Course* MyCo)
 	}
 }
 
-void DeleteCourse(Sem& S, Course*& MyCo, int& count)
+void DeleteCourse(Sem& S, Course*& MyCo, int& count,StuInfo Student)
 {
 	if (MyCo == nullptr)
 	{
@@ -345,6 +345,7 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count)
 	cin >> ID;
 	Course* pCur = MyCo;
 	while (pCur != nullptr && pCur->CoID != ID) pCur = pCur->nxt;
+	RemoveStuofCo(pCur, Student);
 	if (S.C == nullptr)
 	{
 		S.C = pCur;
@@ -368,6 +369,29 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count)
 	}
 	pCur->nxt = nullptr;
 	count--;
+}
+
+void RemoveStuofCo(Course*& MyCo,StuInfo Student)
+{
+	int x = Student.StuID;
+	StuofCourse* pCur = MyCo->SofC;
+	
+	if (MyCo->SofC->Stu.StuID == x) {
+		MyCo->SofC = MyCo->SofC->nxt;
+		delete pCur;
+		return;
+	}
+
+	while (pCur->nxt != nullptr) {
+		if (pCur->nxt->Stu.StuID == x) {
+			StuofCourse* temp = pCur->nxt;
+			pCur->nxt = pCur->nxt->nxt;
+			delete temp;
+			return;
+		}
+		pCur = pCur->nxt;
+	}
+	MyCo->SofC->StuEnroll--;
 }
 
 void OperateTask(Sem& S, Course*& MyCourse, int& y,int count,StuInfo Student)
@@ -394,7 +418,8 @@ void OperateTask(Sem& S, Course*& MyCourse, int& y,int count,StuInfo Student)
 		}
 		case 2:
 		{
-			DeleteCourse(S, MyCourse,count);
+			ViewMyCourse(S, y, MyCourse);
+			DeleteCourse(S, MyCourse,count,Student);
 			break;
 		}
 		case 3:
@@ -402,7 +427,8 @@ void OperateTask(Sem& S, Course*& MyCourse, int& y,int count,StuInfo Student)
 			ViewMyCourse(S, y, MyCourse);
 			break;
 		}
-		case 4: return;
+		case 4: 
+			break;
 		}
 	}
 
@@ -424,7 +450,7 @@ void DeleteList(Course*& MyCo, Sem& S)
 	}
 }
 
-void StoreStuCourse(Course* MyCourse, fstream& f, int count, StuInfo Student)
+void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, StuInfo Student)
 {
 	string filename;
 	filename = to_string(Student.StuID) + ".txt";
@@ -437,20 +463,50 @@ void StoreStuCourse(Course* MyCourse, fstream& f, int count, StuInfo Student)
 	f << count;
 	while (count != 0)
 	{
-		f >> MyCourse->stt;
-		f >> MyCourse->CoID;
-		f >> MyCourse->CoName;
-		f >> MyCourse->TeacherName;
-		f >> MyCourse->Credit;
-		f >> MyCourse->NumofStu;
-		f >> MyCourse->Dayofweek[0];
-		f >> MyCourse->Session[0];
-		f >> MyCourse->Dayofweek[1];
-		f >> MyCourse->Session[1];
+		f << MyCourse->stt<<endl;
+		f << MyCourse->CoID << endl;
+		f << MyCourse->CoName << endl;
+		f << MyCourse->TeacherName << endl;
+		f << MyCourse->Credit << endl;
+		f << MyCourse->NumofStu << endl;
+		f << MyCourse->Dayofweek[0] << endl;
+		f << MyCourse->Session[0] << endl;
+		f << MyCourse->Dayofweek[1] << endl;
+		f << MyCourse->Session[1] << endl;
 		MyCourse = MyCourse->nxt;
 		count--;
 	}
+	f.close();
+}
 
+void StoreStusofCourse(Course* MyCourse, fstream& f, StuInfo Student)
+{
+	string filename;
+	filename = to_string(MyCourse->CoID) + ".txt";
+	f.open(filename, fstream::out);
+	if (f.fail())
+	{
+		cout << "Can't open the Student's Courses file.\n";
+		return;
+	}
+	f << MyCourse->SofC->StuEnroll;
+	int count = MyCourse->SofC->StuEnroll;
+	StuofCourse* pCur = MyCourse->SofC;
+	while (count != 0)
+	{
+		f << pCur->Stu.StuID << " ";
+		f << pCur->Stu.FirstName <<" ";
+		f << pCur->Stu.LastName << " ";
+		f << pCur->Stu.Gender << " ";
+		f << pCur->Stu.day << " ";
+		f << pCur->Stu.month << " ";
+		f << pCur->Stu.year << " ";
+		f << pCur->Stu.SocialID << " ";
+		count--;
+		f << endl;
+		pCur = pCur->nxt;
+	}
+	f.close();
 }
 
 int main()
@@ -472,9 +528,11 @@ int main()
 		InputMyCourse(fstu, MyCo, count, Student);
 		InputAvailCourse(fin, fSoC, Avail, y, MyCo);
 		OperateTask(Avail, MyCo, y, count, Student);
+		StoreCoursesofStu(MyCo, fstu, count, Student);
+		StoreStusofCourse(MyCo, fSoC, Student);
 		fin.close();
 	}
 	DeleteList(MyCo, Avail);
-	StoreStuCourse(MyCo, fstu, count, Student);
+
 	return 0;
 }
