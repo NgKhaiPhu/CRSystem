@@ -251,5 +251,6 @@ int main() {
     Sem se;
     Sem srr[3];
     TCmenu(se, srr, i, year);
+    cout<<"done baby" << endl;
     return 0;
 }
