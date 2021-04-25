@@ -28,6 +28,7 @@ void updateCourse(Sem &se, Sem srr[]);
 bool checkRealTime(Sem srr[], int i);
 bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int*year);
 bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int*year, int* hour, int*min);
+void write_data_course(Sem se, Sem srr[], int i, int year);
 
 void TCmenu(Sem se, Sem srr[], int i, int year) {
     int option;
@@ -47,6 +48,7 @@ void TCmenu(Sem se, Sem srr[], int i, int year) {
         if (option == 4) { displayCourseList(se, srr, i, year); }
     } while (option != 0);
     write_data_CourseList(se,srr,i,year);
+    write_data_course(se,srr,i,year);
 }
 
 
@@ -185,7 +187,7 @@ void deleteCourse(Sem& se, Sem srr[]) {
 
 void updateCourse(Sem &se, Sem srr[]){
     int n;
-    cout << "\t\t\tSem: "; cin>>n;
+    cout << "\t\t\tSem: "; cin>>n; n=n-1;
     cout << "\t\t\tId of course that need to adjusted: ";
     string idfake; cin>>idfake;
     srr[n].cur=srr[n].head;
@@ -255,24 +257,53 @@ void write_data_CourseList(Sem se, Sem srr[], int i, int year){
     ofstream ofs;
     ofs.open("CourseList.csv", ios::out);
     ofs << "Year," << year << endl;
-    ofs << "Sem," << i+1 << endl;
+    int ifake = i+1;
+    ofs << "Sem," << ifake << endl;
     ofs << "Sem Start:," << srr[i].SemStart << endl;
     ofs << "Sem End:," << srr[i].SemEnd << endl;
     ofs << "Registion Start:," << srr[i].regisStart << endl;
     ofs << "Registion End:," << srr[i].regisEnd << endl;
     ofs << "ID,NameCourse,Teacher,Credits,MaxSt,Day 1,Session 1,Day 2,Session 2" << endl;
-    while (srr[i].cur){
+    while (srr[i].cur!=nullptr){
         ofs << srr[i].cur->CoId << ",";
         ofs << srr[i].cur->CoName << ",";
         ofs << srr[i].cur->teacherName << ",";
         ofs << srr[i].cur->credit << ",";
         ofs << srr[i].cur->maxSt << ",";
-        for (int i=0; i<2; i++){
-            ofs << srr[i].cur->day[i] << ",";
-            ofs << srr[i].cur->s[i] << ",";
+        for (int j=0; j<2; j++){
+            ofs << srr[i].cur->day[j] << ",";
+            ofs << srr[i].cur->s[j] << ",";
         } ofs << endl;
-        srr[i].cur=srr[i].cur->next;
+        srr[i].cur = srr[i].cur->next;
     } ofs.close();
+}
+
+void write_data_course(Sem se, Sem srr[], int i, int year){
+    srr[i].cur=srr[i].head;
+    ofstream ofs;
+    ofs.open("CourseList.txt", ios::out);
+    int ifake=i+1;
+    ofs << ifake << endl;
+    ofs << srr[i].SemStart << endl;
+    ofs << srr[i].SemEnd << endl;
+    ofs << srr[i].regisStart << endl;
+    ofs << srr[i].regisEnd << endl;
+    while (srr[i].cur!=nullptr){
+        ofs << srr[i].cur->no << endl;
+        ofs << srr[i].cur->CoId << endl;
+        ofs << srr[i].cur->CoName << endl;
+        ofs << srr[i].cur->teacherName << endl;
+        ofs << srr[i].cur->credit << endl;
+        ofs << srr[i].cur->maxSt << endl;
+        for (int j=0; j<2; j++){
+            ofs << srr[i].cur->day[j] << endl;
+        }
+        for (int j=0; j<2; j++){
+            ofs << srr[i].cur->s[j] << endl;
+        }
+        srr[i].cur=srr[i].cur->next;
+    } ofs << "0";
+    ofs.close();
 }
 
 bool checkRealTime(Sem srr[], int i){
