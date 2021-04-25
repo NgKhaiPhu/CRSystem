@@ -1,0 +1,187 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+struct StuInfo
+{
+	int No;
+	int StuID;
+	char* FirstName;
+	char* LastName;
+	char Gender;
+	int day, month, year;
+	long long int SocialID;
+};
+
+struct Course {
+	int CoID;
+	int stt;
+	string CoName;
+	string TeacherName;
+	int Credit;
+	int NumofStu = 50;
+	string* Dayofweek;
+	string* Session;
+	Course* nxt;
+	StuofCourse* SofC;
+};
+
+struct Sem {
+	int sem;
+	string SemStart;
+	string SemEnd;
+	string regisStart;
+	string regisEnd;
+	Course* C;
+};
+
+struct StuofCourse
+{
+	int StuEnroll;//num of Students enrolling to course right now;
+	StuInfo Stu;
+	StuofCourse* nxt;
+};
+
+void InputAvailCourse(fstream& f, fstream& fSoC, Sem& S, int& y)
+{
+	string filename;
+	y = 1;
+	int t;
+	Course* pcur = nullptr;
+	f >> y;
+	f >> S.sem;
+	f >> S.regisStart;
+	f >> S.regisEnd;
+	f >> S.SemStart;
+	f >> S.SemEnd;
+	f >> t;
+	while (t != 0)
+	{
+		if (S.C == nullptr)
+		{
+			S.C = new Course;
+			pcur = S.C;
+		}
+		else
+		{
+			pcur->nxt = new Course;
+			pcur = pcur->nxt;
+		}
+		pcur->Dayofweek = new string[2];
+		pcur->Session = new string[2];
+		pcur->stt = t;
+		f >> pcur->CoID;
+		f >> pcur->CoName;
+		f >> pcur->TeacherName;
+		f >> pcur->Credit;
+		f >> pcur->NumofStu;
+		f >> pcur->Dayofweek[0];
+		f >> pcur->Session[0];
+		f >> pcur->Dayofweek[1];
+		f >> pcur->Session[1];
+
+		filename = to_string(pcur->CoID) + ".txt";
+		fSoC.open(filename, fstream::in);
+		pcur->SofC = nullptr;
+		f >> pcur->SofC->StuEnroll;
+		StuofCourse* ptmp;
+		while (!fSoC.eof())
+		{
+			if (pcur->SofC == nullptr)
+			{
+				pcur->SofC = new StuofCourse;
+				ptmp = pcur->SofC;
+			}
+			else
+			{
+				ptmp->nxt = new StuofCourse;
+				ptmp = ptmp->nxt;
+			}
+			fSoC >> ptmp->Stu.No;
+			fSoC >> ptmp->Stu.StuID;
+			fSoC >> ptmp->Stu.FirstName;
+			fSoC >> ptmp->Stu.LastName;
+			fSoC >> ptmp->Stu.Gender;
+			fSoC >> ptmp->Stu.day;
+			fSoC >> ptmp->Stu.month;
+			fSoC >> ptmp->Stu.year;
+			fSoC >> ptmp->Stu.SocialID;
+			ptmp->nxt = nullptr;
+		}
+		pcur->nxt = nullptr;
+		f >> t;
+		fSoC.close();
+	}
+}
+
+void ViewAvailableCourse(Sem S, int y)
+{
+	cout << setfill(' ');
+	cout << "Course List of Sem " << S.sem + 1 << " in the year of " << y << " ,which from ";
+	cout << S.SemStart << " to " << S.SemEnd << endl;
+	cout << "==========================================================================================" << endl;
+	cout << "Registion time is from " << S.regisStart << " to " << S.regisEnd << endl;
+	cout << "==========================================================================================" << endl;
+	cout << setw(5) << "ID";
+	cout << setw(15) << "Name";
+	cout << setw(15) << "Teacher";
+	cout << setw(5) << "Credit";
+	cout << setw(5) << "Maximum";
+	cout << setw(15) << "Day";
+	cout << setw(15) << "Sesson";
+	Course* pC = S.C;
+	while (pC != nullptr)
+	{
+		cout << endl;
+		cout << setw(5) << pC->CoID;
+		cout << setw(15) << pC->CoName;
+		cout << setw(15) << pC->TeacherName;
+		cout << setw(5) << pC->Credit;
+		cout << setw(5) << pC->NumofStu;
+		cout << setw(15) << pC->Dayofweek[0];
+		cout << setw(15) << pC->Session[0];
+		cout << endl << setw(89) << pC->Dayofweek[1];
+		cout << endl << setw(15) << pC->Session[1];
+		pC = pC->nxt;
+	}
+}
+
+void ViewStudentsofCourse(Sem S, int x)
+{
+	Course* pCur = S.C;
+	if (pCur == nullptr)
+	{
+		cout << "There are no courses available to view students of the courses.\n";
+		return;
+	}
+	while (pCur != nullptr && pCur->CoID != x)
+		pCur = pCur->nxt;
+	if (pCur == nullptr)
+	{
+		cout << "Wrong Course's ID.\n";
+		return;
+	}
+	int count = 1;
+	StuofCourse* pC = S.C->SofC;
+	cout << endl << "There are "<< pC->StuEnroll << "students of the course you want to view: \n";
+	cout << setw(5) << "No";
+	cout << setw(5) << "ID";
+	cout << setw(15) << "First Name";
+	cout << setw(15) << "Last Name";
+	cout << setw(5) << "Gender";
+	cout << setw(5) << "Day of Birth";
+	while (pC != nullptr)
+	{
+		cout << setw(5)<<count;
+		cout << setw(5) << pC->Stu.StuID;
+		cout << setw(15) << pC->Stu.FirstName;
+		cout << setw(15) << pC->Stu.LastName;
+		cout << setw(5) << pC->Stu.Gender;
+		cout << setw(5) << pC->Stu.day<<"/"<<pC->Stu.month<<"/"<<pC->Stu.year<<endl;
+		pC = pC->nxt;
+	}
+}
+
