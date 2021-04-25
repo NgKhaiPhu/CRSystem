@@ -46,6 +46,7 @@ void TCmenu(Sem se, Sem srr[], int i, int year) {
         if (option == 3) { updateCourse(se, srr); }
         if (option == 4) { displayCourseList(se, srr, i, year); }
     } while (option != 0);
+    write_data_CourseList(se,srr,i,year);
 }
 
 
