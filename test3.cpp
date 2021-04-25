@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <fstream>
 #include <string>
+#include <ctime>
 using namespace std;
 
 struct Course {
@@ -22,8 +23,11 @@ void TCmenu(Sem se, Sem srr[], int i, int year);
 void create_courselist(Sem& se, Sem srr[], int& i, int& year);
 void displayCourseList(Sem se, Sem srr[], int i, int year);
 void deleteCourse(Sem& se, Sem srr[]);
-void read_data(Sem se, Sem srr[], int i, int year);
+void write_data_CourseList(Sem se, Sem srr[], int i, int year);
 void updateCourse(Sem &se, Sem srr[]);
+bool checkRealTime(Sem srr[], int i);
+bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int*year);
+bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int*year, int* hour, int*min);
 
 void TCmenu(Sem se, Sem srr[], int i, int year) {
     int option;
@@ -62,12 +66,14 @@ void create_courselist(Sem& se, Sem srr[], int& i, int& year) {
     cout << "\t\t\t---------------------------" << endl;
     cin.ignore(32727, '\n');
     cout << "\t\t\tWhen is this Sem start and end?" << endl;
+    cout << "\t\t\t(Ex format: dd/mm/yyyy)" << endl;
     cout << "\t\t\tStart in: ";
     getline(cin, srr[i].SemStart);
     cout << "\t\t\tEnd in: ";
     getline(cin, srr[i].SemEnd);
     cout << "\t\t\t---------------------------" << endl;
     cout << "\t\t\tWhen the registion start and end?" << endl;
+    cout << "\t\t\t(Ex format: dd/mm/yyyy hh:mm)" << endl;
     cout << "\t\t\tStart in: ";
     getline(cin, srr[i].regisStart);
     cout << "\t\t\tEnd in: ";
@@ -243,7 +249,270 @@ void updateCourse(Sem &se, Sem srr[]){
     } while (op!=0);
 }
 
+void write_data_CourseList(Sem se, Sem srr[], int i, int year){
+    srr[i].cur = srr[i].head;
+    ofstream ofs;
+    ofs.open("CourseList.csv", ios::out);
+    ofs << "Year," << year << endl;
+    ofs << "Sem," << i+1 << endl;
+    ofs << "Sem Start:," << srr[i].SemStart << endl;
+    ofs << "Sem End:," << srr[i].SemEnd << endl;
+    ofs << "Registion Start:," << srr[i].regisStart << endl;
+    ofs << "Registion End:," << srr[i].regisEnd << endl;
+    ofs << "ID,NameCourse,Teacher,Credits,MaxSt,Day 1,Session 1,Day 2,Session 2" << endl;
+    while (srr[i].cur){
+        ofs << srr[i].cur->CoId << ",";
+        ofs << srr[i].cur->CoName << ",";
+        ofs << srr[i].cur->teacherName << ",";
+        ofs << srr[i].cur->credit << ",";
+        ofs << srr[i].cur->maxSt << ",";
+        for (int i=0; i<2; i++){
+            ofs << srr[i].cur->day[i] << ",";
+            ofs << srr[i].cur->s[i] << ",";
+        } ofs << endl;
+        srr[i].cur=srr[i].cur->next;
+    } ofs.close();
+}
 
+bool checkRealTime(Sem srr[], int i){
+    if (!i) {
+        cout << "There is no course now!" << endl;
+        return false;
+    }
+    string SeStart = srr[i].SemStart;
+    string SeEnd = srr[i].SemEnd;
+    string ReStart = srr[i].regisStart;
+    string ReEnd = srr[i].regisEnd;
+    time_t now = time(NULL);
+    tm* t = localtime(&now);
+    int* day = new int[2];
+    int* mon = new int[2];
+    int* year = new int[2];
+    int* hour = new int[2];
+    int* min = new int[2];
+    
+    if (isInSem(SeStart, SeEnd, t, day, mon, year)==true) {
+        if (isInRe(ReStart, ReEnd, t, day, mon, year, hour, min)==true){
+            return true;
+        } cout << "Enroll time is end!!" << endl;
+        return false;
+    } cout << "\t\t\tSem is end!!" << endl;
+    return false;
+       
+    delete []day;
+    delete []mon;
+    delete []year;
+    delete []hour;
+    delete []min;
+}
+
+bool isInSem(string SeStart, string SeEnd, tm* t, int* day, int* mon, int*year){
+    for (int i=0; i<2; i++) {day[i]=0; mon[i]=0; year[i]=0;}
+    int n=SeStart.length();
+    for (int i=0; i<n; i++){
+        char c=SeStart[i];
+        switch (i){
+            case 0: {
+                day[0] += (c-'0')*10;
+                break;
+            }
+            case 1: {
+                day[0] += c-'0';
+                break;
+            } 
+            case 3: {
+                mon[0] += (c-'0')*10;
+                break;
+            }
+            case 4: {
+                mon[0] += c-'0';
+                break;
+            } 
+            case 6: {
+                year[0] += (c-'0')*1000;
+                break;
+            }
+            case 7: {
+                year[0] += (c-'0')*100;
+                break;
+            } 
+            case 8: {
+                year[0] += (c-'0')*10;
+                break;
+            }
+            case 9: {
+                year[0] += c-'0';
+                break;
+            } 
+            
+            default: continue;
+        };
+    } 
+    for (int i=0; i<n; i++){
+        char c=SeEnd[i];
+        switch (i){
+            case 0: {
+                day[1] += (c-'0')*10;
+                break;
+            }
+            case 1: {
+                day[1] += c-'0';
+                break;
+            } 
+            case 3: {
+                mon[1] += (c-'0')*10;
+                break;
+            }
+            case 4: {
+                mon[1] += c-'0';
+                break;
+            } 
+            case 6: {
+                year[1] += (c-'0')*1000;
+                break;
+            }
+            case 7: {
+                year[1] += (c-'0')*100;
+                break;
+            } 
+            case 8: {
+                year[1] += (c-'0')*10;
+                break;
+            }
+            case 9: {
+                year[1] += c-'0';
+                break;
+            } 
+            
+            default: continue;
+        };
+    }
+    
+    if (1900+t->tm_year<year[0]||1900+t->tm_year>year[1]) return false;
+    else if (1+t->tm_mon<mon[0]||1+t->tm_mon>mon[1]) return false;
+    else if (t->tm_mday<day[0]||t->tm_mday>day[1]) return false;
+    else return true;
+}
+
+bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int*year, int* hour, int*min){
+    for (int i=0; i<2; i++) {day[i]=0; mon[i]=0; year[i]=0; hour[i]=0; min[i]=0;}
+    int n=ReStart.length();
+    for (int i=0; i<n; i++){
+        char c=ReStart[i];
+        switch (i){
+            case 0: {
+                day[0] += (c-'0')*10;
+                break;
+            }
+            case 1: {
+                day[0] += c-'0';
+                break;
+            } 
+            case 3: {
+                mon[0] += (c-'0')*10;
+                break;
+            }
+            case 4: {
+                mon[0] += c-'0';
+                break;
+            } 
+            case 6: {
+                year[0] += (c-'0')*1000;
+                break;
+            }
+            case 7: {
+                year[0] += (c-'0')*100;
+                break;
+            } 
+            case 8: {
+                year[0] += (c-'0')*10;
+                break;
+            }
+            case 9: {
+                year[0] += c-'0';
+                break;
+            } 
+            case 11: {
+                hour[0] += (c-'0')*10;
+                break;
+            }
+            case 12: {
+                hour[0] += c-'0';
+                break;
+            } 
+            case 14: {
+                min[0] += (c-'0')*10;
+                break;
+            }
+            case 15: {
+                min[0] += c-'0';
+                break;
+            }
+            default: continue;
+        };
+    } 
+    for (int i=0; i<n; i++){
+        char c=ReEnd[i];
+        switch (i){
+            case 0: {
+                day[1] += (c-'0')*10;
+                break;
+            }
+            case 1: {
+                day[1] += c-'0';
+                break;
+            } 
+            case 3: {
+                mon[1] += (c-'0')*10;
+                break;
+            }
+            case 4: {
+                mon[1] += c-'0';
+                break;
+            } 
+            case 6: {
+                year[1] += (c-'0')*1000;
+                break;
+            }
+            case 7: {
+                year[1] += (c-'0')*100;
+                break;
+            } 
+            case 8: {
+                year[1] += (c-'0')*10;
+                break;
+            }
+            case 9: {
+                year[1] += c-'0';
+                break;
+            } 
+            case 11: {
+                hour[1] += (c-'0')*10;
+                break;
+            }
+            case 12: {
+                hour[1] += c-'0';
+                break;
+            } 
+            case 14: {
+                min[1] += (c-'0')*10;
+                break;
+            }
+            case 15: {
+                min[1] += c-'0';
+                break;
+            }
+            default: continue;
+        };
+    } 
+    
+    if (1900+t->tm_year<year[0]||1900+t->tm_year>year[1]) return false;
+    else if (1+t->tm_mon<mon[0]||1+t->tm_mon>mon[1]) return false;
+    else if (t->tm_mday<day[0]||t->tm_mday>day[1]) return false;
+    else if (t->tm_hour<hour[0]||t->tm_hour>hour[1]) return false;
+    else if (t->tm_min<min[0]||t->tm_min>min[1]) return false;
+    else return true;
+}
 
 int main() {
     int i;
