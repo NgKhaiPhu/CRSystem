@@ -141,7 +141,7 @@ void displayCourseList(Sem se, Sem srr[], int i, int year, int season){
         srr[i].head=srr[i].head->next;
     }
 }
-
+/////////////////////
 void deleteCourse(Sem &se, Sem srr[], int i){
     int ids, m;
     cout << endl;
