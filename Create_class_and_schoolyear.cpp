@@ -11,6 +11,7 @@ struct date
 		year;
 };
 
+
 struct student
 {
 	int no,
