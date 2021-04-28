@@ -12,7 +12,7 @@ struct Course {
     string day[2], s[2];
     Course* next;
 };
-
+//
 struct Sem {
     string SemStart, SemEnd, regisStart, regisEnd;
     Course s;
