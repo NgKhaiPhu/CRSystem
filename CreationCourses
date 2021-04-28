@@ -12,7 +12,7 @@ struct Course {
     string day[2], s[2];
     Course* next;
 };
-//
+
 struct Sem {
     string SemStart, SemEnd, regisStart, regisEnd;
     Course s;
@@ -53,6 +53,7 @@ void TCmenu(Sem se, Sem srr[], int i, int year) {
 
 
 void create_courselist(Sem& se, Sem srr[], int& i, int& year) {
+    ofstream ofs;
     cout << "\t\t\t============================================" << endl;
     cout << "\t\t\t=   Create a List of Course for this Sem   =" << endl;
     cout << "\t\t\t============================================" << endl;
@@ -101,6 +102,9 @@ void create_courselist(Sem& se, Sem srr[], int& i, int& year) {
         getline(cin, srr[i].cur->CoId);
         cout << "\t\t\tName of course: ";
         getline(cin, srr[i].cur->CoName);
+        string a = srr[i].cur->CoName + ".csv";
+        ofs.open(a, ios::out);
+        ofs.close();
         cout << "\t\t\tTeacher in class: ";
         getline(cin, srr[i].cur->teacherName);
         cout << "\t\t\tNumber of credits: ";
