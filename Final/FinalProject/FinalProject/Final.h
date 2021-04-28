@@ -1,4 +1,11 @@
+#ifndef _FINAL_H_
+#define _FINAL_H_
+
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 
 struct date
@@ -12,6 +19,7 @@ struct student
 {
 	int no;
 	int id;
+	string username;
 	string firstname;
 	string lastname;
 	string password;
@@ -30,6 +38,7 @@ struct staff
 	string password;
 	string username;
 	const int type = 1;
+	staff* next;
 };
 
 struct Course {
@@ -52,11 +61,11 @@ struct Sem {
 	Course* cur = nullptr;
 };
 
-void inputAcc(fstream& acc, student*& a);
-void login(student* a, string& usn);
-void deleteList(student*& a);
+void inputAcc(fstream& acc, student*& stu, staff*& sta);
+void login(student* stu, string& usn);
+void deleteList(student*& stu);
 void display(ifstream& ifs, string u);
-void changepass(fstream& fs, string u, student* a);
+void changepass(fstream& fs, string u, student* stu);
 
 //realtime
 void takeRealTime(string SemStart, string SemEnd, string ReStart, string ReEnd);
@@ -84,15 +93,5 @@ void ViewMyCourse(Sem S, int y, Course* MyCo);
 void DeleteCourse(Sem& S, Course*& MyCo);
 void OperateTask(Sem& S, Course*& MyCourse, int& y);
 
-//5
-void viewClass() {};
-void ViewStudentofClass(student* head);
-void viewCourseStu() {};
 
-//6
-void exportClassList() {};
-void importScore() {};//(CSV) 1,20127062,Nguyen Khai Phu,8,10,7,5
-void viewCourseScore() {};
-void upScore() {};
-void viewClassScore() {};//Final scores, Sem GPA, overall GPA
-void viewStuScore() {};
+#endif
