@@ -37,18 +37,20 @@ struct course_class
 };
 
 string choose_class();
-void load_stu_course_class(student*& head, string classs);
-void export_student_in_courses(student* head,string* classs);
+void load_stu_course_class(student*& head, string* classs);
+void export_student_in_courses(student* head, string* classs);
 
 int main()
 {
 	student* head = nullptr;
 	string classs = choose_class();// Chon lop de export file
 
-	
+	load_stu_course_class(head, &classs);
 	export_student_in_courses(head, &classs);
 
 }
+
+
 
 
 void export_student_in_courses(student* head, string* classs)
@@ -69,7 +71,8 @@ void export_student_in_courses(student* head, string* classs)
 			output << head->dob.day << "/" << head->dob.month << "/" << head->dob.year << ",";
 			output << head->sclass << ",";
 			output << head->socialid << ",";
-			output << ",,,";
+			output << ",,," << endl;
+			
 			if (head->next != nullptr)  cout << endl;
 
 			head = head->next;
@@ -138,8 +141,43 @@ string choose_class()
 	
 }
 
-void load_stu_course_class(student*& head,string classs)
+void load_stu_course_class(student*& head,string* classs)
 {
+	fstream data;
+	data.open((*classs + ".csv").c_str(), fstream::in);
+	if (!data.is_open()) return;
+	
+	data.ignore(1000,'\n');
+	char temp;
+	student* current = nullptr;
+	while (!data.eof())
+	{
+		student* add = new student;
+		data >> add->no; if (add->no < 0)break;
+		data >> temp;
 
+		data >> add->id; data >> temp;
+		getline(data, add->firstname, ',');
+		getline(data, add->lastname, ',');
+		getline(data, add->gender, ',');
+		data >> add->dob.day; data >> temp;
+		data >> add->dob.month; data >> temp;
+		data >> add->dob.year; data >> temp;
+		data >> add->socialid;
+		data.ignore();
+		if (head == nullptr)
+		{
+			head = add;
+			current = head;
+	}
+		else
+		{
+			current->next = add;
+			current = current->next;
+		}
+		current->next = nullptr;
+
+	}
+	data.close();
 }
 
