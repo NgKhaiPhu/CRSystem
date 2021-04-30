@@ -5,51 +5,59 @@
 #include <iomanip>
 using namespace std;
 
-struct StuInfo
+struct date
 {
-	int No;
-	int StuID;
-	char* FirstName;
-	char* LastName;
-	char Gender;
-	int day, month, year;
-	long long int SocialID;
+	int day;
+	int month;
+	int year;
+};
+
+struct student
+{
+	int no;
+	long int id;
+	string firstname;
+	string lastname ;
+	string password;
+	string sclass;
+	string gender;
+	const int type = 0;
+	int socialid;
+	student* next;
+	date dob;
 };
 
 struct Course {
-	int CoID;
-	int stt;
-	string CoName;
-	string TeacherName;
-	int Credit;
-	int NumofStu = 50;
-
-	string* Dayofweek;
-	string* Session;
-	Course* nxt;
-	StuofCourse *SofC;
+	int no;
+	string CoId, CoName, teacherName;
+	int credit, maxSt = 50;
+	string day[2], s[2];
+	Course* next;
+	StuofCourse *SofC=nullptr;
 };
 
 struct Sem {
-	int sem;
+	int year;
 	string SemStart;
 	string SemEnd;
 	string regisStart;
 	string regisEnd;
-	Course* C;
+	Course* head = nullptr;
+	Course* cur = nullptr;
+	Course s;
 };
 
 struct StuofCourse
 {
 	int StuEnroll;//num of Students enrolling to course right now;
-	StuInfo Stu;
-	StuofCourse* nxt;
+	student Stu;
+	StuofCourse* next;
 };
 
-void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student)
+void InputMyCourse(fstream& f, Course* MyCo, int &n, student Student)
 {
 	string filename;
-	filename = to_string(Student.StuID) + ".txt";
+	filename = to_string(Student.id) + "_Courses.txt";
 	f.open(filename, fstream::in);
 	int count = n;
 	Course* pcur = MyCo;
@@ -67,36 +75,36 @@ void InputMyCourse(fstream& f, Course* MyCo, int &n, StuInfo Student)
 		}
 		else
 		{
-			pcur->nxt = new Course;
-			pcur = pcur->nxt;
+			pcur->next = new Course;
+			pcur = pcur->next;
 		}
-		pcur->Dayofweek = new string[2];
-		pcur->Session = new string[2];
-		f >> pcur->stt;
-		f >> pcur->CoID;
+		f >> pcur->no;
+		f >> pcur->CoId;
 		f >> pcur->CoName;
-		f >> pcur->TeacherName;
-		f >> pcur->Credit;
-		f >> pcur->NumofStu;
-		f >> pcur->Dayofweek[0];
-		f >> pcur->Session[0];
-		f >> pcur->Dayofweek[1];
-		f >> pcur->Session[1];
-		pcur->nxt = nullptr;
+		f >> pcur->teacherName;
+		f >> pcur->credit;
+		f >> pcur->maxSt;
+		f >> pcur->day[0];
+		f >> pcur->s[0];
+		f >> pcur->day[1];
+		f >> pcur->s[1];
+		pcur->next = nullptr;
 		count--;
 	}
 	f.close();
 }
 
-void InputAvailCourse(fstream& f,fstream& fSoC, Sem& S, int& y, Course* MyCo)
+void InputAvailCourse( Sem& S, int& y, Course* MyCo)
 {
+	fstream f, fSoC;
+	f.open("AvailCourse.txt", fstream::in);
 	string filename;
 
-	y = 1;
+	y = 2;
 	int t;
 	Course* pcur = nullptr;
 	f >> y;
-	f >> S.sem;
+	f >> S.year;
 	f >> S.regisStart;
 	f >> S.regisEnd;
 	f >> S.SemStart;
@@ -104,30 +112,28 @@ void InputAvailCourse(fstream& f,fstream& fSoC, Sem& S, int& y, Course* MyCo)
 	f >> t;
 	while (t != 0)
 	{
-		if (S.C == nullptr)
+		if (S.head == nullptr)
 		{
-			S.C = new Course;
-			pcur = S.C;
+			S.head = new Course;
+			pcur = S.head;
 		}
 		else
 		{
-			pcur->nxt = new Course;
-			pcur = pcur->nxt;
+			pcur->next = new Course;
+			pcur = pcur->next;
 		}
-		pcur->Dayofweek = new string[2];
-		pcur->Session = new string[2];
-		pcur->stt = t;	
-		f >> pcur->CoID;
+		pcur->no = t;	
+		f >> pcur->CoId;
 		f >> pcur->CoName;
-		f >> pcur->TeacherName;
-		f >> pcur->Credit;
-		f >> pcur->NumofStu;
-		f >> pcur->Dayofweek[0];
-		f >> pcur->Session[0];
-		f >> pcur->Dayofweek[1];
-		f >> pcur->Session[1];
+		f >> pcur->teacherName;
+		f >> pcur->credit;
+		f >> pcur->maxSt;
+		f >> pcur->day[0];
+		f >> pcur->s[0];
+		f >> pcur->day[1];
+		f >> pcur->s[1];
 		
-		filename = to_string(pcur->CoID) + ".txt";
+		filename = pcur->CoId + ".txt";
 		fSoC.open(filename, fstream::in);
 		pcur->SofC = nullptr;
 		f >>  pcur->SofC->StuEnroll;
@@ -141,46 +147,47 @@ void InputAvailCourse(fstream& f,fstream& fSoC, Sem& S, int& y, Course* MyCo)
 			}
 			else
 			{
-				ptmp->nxt = new StuofCourse;
-				ptmp = ptmp->nxt;
+				ptmp->next = new StuofCourse;
+				ptmp = ptmp->next;
 			}
-			fSoC >> ptmp->Stu.No;
-			fSoC >> ptmp->Stu.StuID;
-			fSoC >> ptmp->Stu.FirstName;
-			fSoC >> ptmp->Stu.LastName;
-			fSoC >> ptmp->Stu.Gender;
-			fSoC >> ptmp->Stu.day;
-			fSoC >> ptmp->Stu.month;
-			fSoC >> ptmp->Stu.year;
-			fSoC >> ptmp->Stu.SocialID;
-			ptmp->nxt=nullptr;
+			fSoC >> ptmp->Stu.no;
+			fSoC >> ptmp->Stu.id;
+			fSoC >> ptmp->Stu.firstname;
+			fSoC >> ptmp->Stu.lastname ;
+			fSoC >> ptmp->Stu.gender;
+			fSoC >> ptmp->Stu.dob.day;
+			fSoC >> ptmp->Stu.dob.month;
+			fSoC >> ptmp->Stu.dob.year;
+			fSoC >> ptmp->Stu.socialid;
+			ptmp->next=nullptr;
 		}
-		pcur->nxt = nullptr;
+		pcur->next = nullptr;
 		f >> t;
 		fSoC.close();
 	}
-	while (MyCo->nxt != nullptr)
+	while (MyCo->next != nullptr)
 	{
-		RemoveAlreadyCourses(S.C, MyCo->stt);
-		MyCo = MyCo->nxt;
+		RemoveAlreadyCourses(S.head, MyCo->no);
+		MyCo = MyCo->next;
 	}
+	f.close();
 }
 
-void EnrollCourse(Sem S, Course*& MyCourse, int& count,StuInfo Student) // S la hoc ki voi cac course dc staff nhap vao
+void EnrollCourse(Sem S, Course*& MyCourse, int& count,student Student) // S la hoc ki voi cac course dc staff nhap vao
 {
 	if (count == 5)
 	{
 		cout << "You have met the limit of ernrollment course!!!" << endl;
 		return;
 	}
-	int ID;
+	string ID;
 	bool check;
-	if (S.C == nullptr)	return;
+	if (S.head == nullptr)	return;
 	cout << endl << "Please input the Course ID you want to enroll." << endl;
 	cout << "ID: ";
 	cin >> ID;
-	Course* pC = S.C;
-	while (pC != nullptr && pC->CoID != ID) pC = pC->nxt;
+	Course* pC = S.head;
+	while (pC != nullptr && pC->CoId != ID) pC = pC->next;
 	if (MyCourse != nullptr)
 	{
 		Course* pCheck = MyCourse;
@@ -188,8 +195,8 @@ void EnrollCourse(Sem S, Course*& MyCourse, int& count,StuInfo Student) // S la 
 		{
 			for (int i = 0; i < 2; i++)
 				for (int j = 0; j < 2; j++)
-					if (pC->Dayofweek[i] == pCheck->Dayofweek[j])
-						if (pC->Session[i] == pCheck->Session[j])
+					if (pC->day[i] == pCheck->day[j])
+						if (pC->s[i] == pCheck->s[j])
 						{
 							check = false;
 							cout << " Enrollment fails. Session is conficted!" << endl;
@@ -209,46 +216,46 @@ void EnrollCourse(Sem S, Course*& MyCourse, int& count,StuInfo Student) // S la 
 	}
 	else
 	{
-		while (pcur->nxt != nullptr) pcur = pcur->nxt;
-		pcur->nxt = pC;
+		while (pcur->next != nullptr) pcur = pcur->next;
+		pcur->next = pC;
 	}
-	if (pC == S.C)
+	if (pC == S.head)
 	{
-		S.C = S.C->nxt;
+		S.head = S.head->next;
 	}
 	else
 	{
-		Course* pLink = S.C;
-		while (pLink->nxt != pC) pLink = pLink->nxt;
-		pLink->nxt = pC->nxt;
+		Course* pLink = S.head;
+		while (pLink->next != pC) pLink = pLink->next;
+		pLink->next = pC->next;
 	}
-	pC->nxt = nullptr;
+	pC->next = nullptr;
 	AddStutoCourse(pC,Student);
 	count++;
 }
 
-void AddStutoCourse(Course* MyCo, StuInfo Student)
+void AddStutoCourse(Course* MyCo, student Student)
 {
 	StuofCourse* pCur = MyCo->SofC;
-	while (pCur->nxt != nullptr)	pCur = pCur->nxt;
-	pCur->nxt = new StuofCourse;
-	pCur = pCur->nxt;
+	while (pCur->next != nullptr)	pCur = pCur->next;
+	pCur->next = new StuofCourse;
+	pCur = pCur->next;
 	pCur->StuEnroll++;
-	pCur->Stu.StuID = Student.StuID;
-	pCur->Stu.day = Student.day;
-	pCur->Stu.FirstName = Student.FirstName;
-	pCur->Stu.LastName= Student.LastName;
-	pCur->Stu.Gender = Student.Gender;
-	pCur->Stu.month = Student.month;
-	pCur->Stu.year = Student.year;
-	pCur->Stu.SocialID = Student.SocialID;
-	pCur->Stu.No = Student.No;
+	pCur->Stu.id = Student.id;
+	pCur->Stu.dob.day = Student.dob.day;
+	pCur->Stu.firstname = Student.firstname;
+	pCur->Stu.lastname = Student.lastname ;
+	pCur->Stu.gender = Student.gender;
+	pCur->Stu.dob.month = Student.dob.month;
+	pCur->Stu.dob.year = Student.dob.year;
+	pCur->Stu.socialid = Student.socialid;
+	pCur->Stu.no = Student.no;
 }
 
 void ViewAvailableCourse(Sem S, int y)
 {
 	cout << setfill(' ');
-	cout << "Course List of Sem " << S.sem + 1 << " in the year of " << y << " ,which from ";
+	cout << "Course List of Sem " << S.year  << " in the year of " << y << " ,which from ";
 	cout << S.SemStart << " to " << S.SemEnd << endl;
 	cout << "==========================================================================================" << endl;
 	cout << "Registion time is from " << S.regisStart << " to " << S.regisEnd << endl;
@@ -256,24 +263,24 @@ void ViewAvailableCourse(Sem S, int y)
 	cout << setw(5) << "ID";
 	cout << setw(15) << "Name";
 	cout << setw(15) << "Teacher";
-	cout << setw(5) << "Credit";
+	cout << setw(5) << "credit";
 	cout << setw(5) << "Maximum";
 	cout << setw(15) << "Day";
 	cout << setw(15) << "Sesson";
-	Course* pC = S.C;
+	Course* pC = S.head;
 	while (pC != nullptr)
 	{
 		cout << endl;
-		cout << setw(5) << pC->CoID;
+		cout << setw(5) << pC->CoId;
 		cout << setw(15) << pC->CoName;
-		cout << setw(15) << pC->TeacherName;
-		cout << setw(5) << pC->Credit;
-		cout << setw(5) << pC->NumofStu;
-		cout << setw(15) << pC->Dayofweek[0];
-		cout << setw(15) << pC->Session[0];
-		cout << endl << setw(89) << pC->Dayofweek[1];
-		cout << endl << setw(15) << pC->Session[1];
-		pC = pC->nxt;
+		cout << setw(15) << pC->teacherName;
+		cout << setw(5) << pC->credit;
+		cout << setw(5) << pC->maxSt;
+		cout << setw(15) << pC->day[0];
+		cout << setw(15) << pC->s[0];
+		cout << endl << setw(89) << pC->day[1];
+		cout << endl << setw(15) << pC->s[1];
+		pC = pC->next;
 	}
 }
 
@@ -281,26 +288,26 @@ void RemoveAlreadyCourses(Course*& pHead, int k)
 {
 	if (pHead == nullptr) return;
 	Course* pCur = pHead;
-	if (pHead->stt == k) {
-		pHead = pHead->nxt;
+	if (pHead->no == k) {
+		pHead = pHead->next;
 		delete pCur;
 		return;
 	}
-	while (pCur->nxt != nullptr) {
-		if (pCur->nxt->stt == k) {
-			Course* temp = pCur->nxt;
-			pCur->nxt = pCur->nxt->nxt;
+	while (pCur->next != nullptr) {
+		if (pCur->next->no == k) {
+			Course* temp = pCur->next;
+			pCur->next = pCur->next->next;
 			delete temp;
 			return;
 		}
-		pCur = pCur->nxt;
+		pCur = pCur->next;
 	}
 }
 
 void ViewMyCourse(Sem S, int y, Course* MyCo)
 {
 	cout << setfill(' ');
-	cout << "Course List of Sem " << S.sem + 1 << " in the year of " << y << " ,which from ";
+	cout << "Course List of Sem " << y << " in the year of " << S.year << " ,which from ";
 	cout << S.SemStart << " to " << S.SemEnd << endl;
 	cout << "==========================================================================================" << endl;
 	cout << "Registion time is from " << S.regisStart << " to " << S.regisEnd << endl;
@@ -308,7 +315,7 @@ void ViewMyCourse(Sem S, int y, Course* MyCo)
 	cout << setw(5) << "ID";
 	cout << setw(15) << "Name";
 	cout << setw(15) << "Teacher";
-	cout << setw(5) << "Credit";
+	cout << setw(5) << "credit";
 	cout << setw(5) << "Maximum";
 	cout << setw(15) << "Day";
 	cout << setw(15) << "Sesson";
@@ -317,84 +324,84 @@ void ViewMyCourse(Sem S, int y, Course* MyCo)
 	while (pC != nullptr)
 	{
 		cout << endl;
-		cout << setw(5) << pC->CoID;
+		cout << setw(5) << pC->CoId;
 		cout << setw(15) << pC->CoName;
-		cout << setw(15) << pC->TeacherName;
-		cout << setw(5) << pC->Credit;
-		cout << setw(5) << pC->NumofStu;
-		cout << setw(15) << pC->Dayofweek[0];
-		cout << setw(15) << pC->Session[0];
-		cout << endl << setw(89) << pC->Dayofweek[1];
-		cout << endl << setw(15) << pC->Session[1];
-		pC = pC->nxt;
+		cout << setw(15) << pC->teacherName;
+		cout << setw(5) << pC->credit;
+		cout << setw(5) << pC->maxSt;
+		cout << setw(15) << pC->day[0];
+		cout << setw(15) << pC->s[0];
+		cout << endl << setw(89) << pC->day[1];
+		cout << endl << setw(15) << pC->s[1];
+		pC = pC->next;
 	}
 }
 
-void DeleteCourse(Sem& S, Course*& MyCo, int& count,StuInfo Student)
+void DeleteCourse(Sem& S, Course*& MyCo, int& count,student Student)
 {
 	if (MyCo == nullptr)
 	{
 		cout << "There are no courses available to delete!!! \n";
 		return;
 	}
-	Course* pC = S.C;
-	if (S.C != nullptr) while (pC->nxt != nullptr) pC = pC->nxt;
-	int ID;
+	Course* pC = S.head;
+	if (S.head != nullptr) while (pC->next != nullptr) pC = pC->next;
+	string ID;
 	cout << "Input the Course ID that you want to delete. \n";
 	cout << "ID: ";
 	cin >> ID;
 	Course* pCur = MyCo;
-	while (pCur != nullptr && pCur->CoID != ID) pCur = pCur->nxt;
+	while (pCur != nullptr && pCur->CoId != ID) pCur = pCur->next;
 	RemoveStuofCo(pCur, Student);
-	if (S.C == nullptr)
+	if (S.head == nullptr)
 	{
-		S.C = pCur;
+		S.head = pCur;
 	}
 	else
 	{
-		Course* pC = S.C;
-		while (pC->nxt != nullptr) pC = pC->nxt;
-		pC->nxt = pCur;
+		Course* pC = S.head;
+		while (pC->next != nullptr) pC = pC->next;
+		pC->next = pCur;
 	}
 
 	if (pCur == MyCo)
 	{
-		MyCo = MyCo->nxt;
+		MyCo = MyCo->next;
 	}
 	else
 	{
 		Course* pLink = MyCo;
-		while (pLink->nxt != pCur) pLink = pLink->nxt;
-		pLink->nxt = pC->nxt;
+		while (pLink->next != pCur) pLink = pLink->next;
+		pLink->next = pC->next;
 	}
-	pCur->nxt = nullptr;
+	pCur->next = nullptr;
 	count--;
 }
 
-void RemoveStuofCo(Course*& MyCo,StuInfo Student)
+void RemoveStuofCo(Course*& MyCo,student Student)
 {
-	int x = Student.StuID;
+	int x = Student.id;
 	StuofCourse* pCur = MyCo->SofC;
 	
-	if (MyCo->SofC->Stu.StuID == x) {
-		MyCo->SofC = MyCo->SofC->nxt;
+	if (MyCo->SofC->Stu.id == x) {
+		MyCo->SofC = MyCo->SofC->next;
 		delete pCur;
 		return;
 	}
 
-	while (pCur->nxt != nullptr) {
-		if (pCur->nxt->Stu.StuID == x) {
-			StuofCourse* temp = pCur->nxt;
-			pCur->nxt = pCur->nxt->nxt;
+	while (pCur->next != nullptr) {
+		if (pCur->next->Stu.id == x) {
+			StuofCourse* temp = pCur->next;
+			pCur->next = pCur->next->next;
 			delete temp;
 			return;
 		}
-		pCur = pCur->nxt;
+		pCur = pCur->next;
 	}
 	MyCo->SofC->StuEnroll--;
 }
 
-void OperateTask(Sem& S, Course*& MyCourse, int& y,int count,StuInfo Student)
+void OperateTask(Sem& S, Course*& MyCourse, int& y,int count,student Student)
 {
 	int option = 1;
 	while (option != 4)
@@ -438,22 +445,34 @@ void DeleteList(Course*& MyCo, Sem& S)
 {
 	while (MyCo != nullptr)
 	{
+		while (MyCo->SofC != nullptr)
+		{
+			StuofCourse* pTmp1 = MyCo->SofC;
+			MyCo->SofC = MyCo->SofC->next;
+			delete pTmp1;
+		}
 		Course* pTmp = MyCo;
-		MyCo = MyCo->nxt;
+		MyCo = MyCo->next;
 		delete pTmp;
 	}
-	while (S.C != nullptr)
+	while (S.head != nullptr)
 	{
-		Course* pTmp = S.C;
-		S.C = S.C->nxt;
+		while (S.head->SofC != nullptr)
+		{
+			StuofCourse* pTmp1 = S.head->SofC;
+			S.head->SofC = S.head->SofC->next;
+			delete pTmp1;
+		}
+		Course* pTmp = S.head;
+		S.head = S.head->next;
 		delete pTmp;
 	}
 }
 
-void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, StuInfo Student)
+void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, student Student)
 {
 	string filename;
-	filename = to_string(Student.StuID) + ".txt";
+	filename = to_string(Student.id) + "_Courses.txt";
 	f.open(filename, fstream::out);
 	if (f.fail())
 	{
@@ -463,26 +482,26 @@ void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, StuInfo Student)
 	f << count;
 	while (count != 0)
 	{
-		f << MyCourse->stt<<endl;
-		f << MyCourse->CoID << endl;
+		f << MyCourse->no<<endl;
+		f << MyCourse->CoId << endl;
 		f << MyCourse->CoName << endl;
-		f << MyCourse->TeacherName << endl;
-		f << MyCourse->Credit << endl;
-		f << MyCourse->NumofStu << endl;
-		f << MyCourse->Dayofweek[0] << endl;
-		f << MyCourse->Session[0] << endl;
-		f << MyCourse->Dayofweek[1] << endl;
-		f << MyCourse->Session[1] << endl;
-		MyCourse = MyCourse->nxt;
+		f << MyCourse->teacherName << endl;
+		f << MyCourse->credit << endl;
+		f << MyCourse->maxSt << endl;
+		f << MyCourse->day[0] << endl;
+		f << MyCourse->s[0] << endl;
+		f << MyCourse->day[1] << endl;
+		f << MyCourse->s[1] << endl;
+		MyCourse = MyCourse->next;
 		count--;
 	}
 	f.close();
 }
 
-void StoreStusofCourse(Course* MyCourse, fstream& f, StuInfo Student)
+void StoreStusofCourse(Course* MyCourse, fstream& f, student Student)
 {
 	string filename;
-	filename = to_string(MyCourse->CoID) + ".txt";
+	filename = MyCourse->CoId + "_Students.txt";
 	f.open(filename, fstream::out);
 	if (f.fail())
 	{
@@ -494,44 +513,36 @@ void StoreStusofCourse(Course* MyCourse, fstream& f, StuInfo Student)
 	StuofCourse* pCur = MyCourse->SofC;
 	while (count != 0)
 	{
-		f << pCur->Stu.StuID << " ";
-		f << pCur->Stu.FirstName <<" ";
-		f << pCur->Stu.LastName << " ";
-		f << pCur->Stu.Gender << " ";
-		f << pCur->Stu.day << " ";
-		f << pCur->Stu.month << " ";
-		f << pCur->Stu.year << " ";
-		f << pCur->Stu.SocialID << " ";
+		f << pCur->Stu.id << " ";
+		f << pCur->Stu.firstname <<" ";
+		f << pCur->Stu.lastname  << " ";
+		f << pCur->Stu.gender << " ";
+		f << pCur->Stu.dob.day << " ";
+		f << pCur->Stu.dob.month << " ";
+		f << pCur->Stu.dob.year << " ";
+		f << pCur->Stu.socialid << " ";
 		count--;
 		f << endl;
-		pCur = pCur->nxt;
+		pCur = pCur->next;
 	}
 	f.close();
 }
 
 int main()
 {
-	StuInfo Student;
+	student Student;
 	int count = 0;
 	Sem Avail;
 	Course* MyCo;
 	fstream fin, fstu, fSoC;
-	fin.open("AvailCourse.txt", fstream::in);
 	int y;
-	if (fin.fail())
-	{
-		cout << "Can't open the file !!!";
-		return 0;
-	}
-	else
-	{
+
 		InputMyCourse(fstu, MyCo, count, Student);
-		InputAvailCourse(fin, fSoC, Avail, y, MyCo);
+		InputAvailCourse(Avail, y, MyCo);
 		OperateTask(Avail, MyCo, y, count, Student);
 		StoreCoursesofStu(MyCo, fstu, count, Student);
 		StoreStusofCourse(MyCo, fSoC, Student);
 		fin.close();
-	}
 	DeleteList(MyCo, Avail);
 
 	return 0;
