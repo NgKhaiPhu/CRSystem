@@ -25,8 +25,7 @@ struct student
 	date dob;
 };
 
-void ViewClass() {
-	ifstream myfile;
+void ViewClass(ifstream myfile) {
 	string temp;
 	myfile.open("classes.txt");
 	if (myfile.eof() || !myfile.is_open()) {
@@ -48,7 +47,7 @@ void ViewStudentofClass(student* head) {
 	cin >> temp;
 
 	ifstream myfile;	
-	myfile.open("classes.txt");
+	myfile.open("classes.csv");
 	if (!myfile.is_open()) {
 		cout << "Cannot access list of classes\n";
 		return;
@@ -65,7 +64,7 @@ void ViewStudentofClass(student* head) {
 	}
 
 	ifstream classfile;
-	classfile.open("classes.txt");
+	classfile.open(check + ".csv");
 	if (!classfile.is_open()) {
 		cout << "Class does not exist\n";
 		return;

@@ -1,0 +1,2 @@
+0,StudentID,password,fullname,Gender,DOB
+1,username,password,fullname,Gender

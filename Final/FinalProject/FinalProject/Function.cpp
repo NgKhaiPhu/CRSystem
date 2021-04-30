@@ -243,7 +243,7 @@ void create_school_year()
 }
 
 //2 
-void TCmenu(Sem se, Sem srr[], int i, int year) {
+void TCmenu(Sem srr[], int i, int year) {
     bool menuOn = true;
     int option;
     do {
@@ -262,27 +262,27 @@ void TCmenu(Sem se, Sem srr[], int i, int year) {
             menuOn = false;
             break;
         case 1: 
-            create_courselist(se, srr, i, year);
+            create_courselist(srr, i, year);
             break;
         case 2: 
-            deleteCourse(se, srr);
+            deleteCourse(srr);
             break;
         case 3:
-            updateCourse(se, srr);
+            updateCourse(srr);
             break;
         case 4:
-            displayCourseList(se, srr, i, year);
+            displayCourseList(srr, i, year);
             break;
         default:
             cout << "Invalid option. Please enter again\n";
             break;
         }
     } while (menuOn);
-    write_data_CourseList(se, srr, i, year);
-    write_data_course(se, srr, i, year);
+    write_data_CourseList(srr, i, year);
+    write_data_course(srr, i, year);
 }
 
-void create_courselist(Sem& se, Sem srr[], int& i, int& year) {
+void create_courselist(Sem srr[], int& i, int& year) {
     ofstream ofs;
     cout << "\t\t\t============================================" << endl;
     cout << "\t\t\t=   Create a List of Course for this semester   =" << endl;
@@ -354,7 +354,7 @@ void create_courselist(Sem& se, Sem srr[], int& i, int& year) {
     }
 }
 
-void displayCourseList(Sem se, Sem srr[], int i, int year) {
+void displayCourseList(Sem srr[], int i, int year) {
     srr[i].cur = srr[i].head;
     cout << endl << endl;
     cout << setfill(' ');
@@ -390,7 +390,7 @@ void displayCourseList(Sem se, Sem srr[], int i, int year) {
     }
 }
 
-void deleteCourse(Sem& se, Sem srr[]) {
+void deleteCourse(Sem srr[]) {
     string ids;
     int m;
     cout << endl;
@@ -418,7 +418,7 @@ void deleteCourse(Sem& se, Sem srr[]) {
     }
 }
 
-void updateCourse(Sem& se, Sem srr[]) {
+void updateCourse(Sem srr[]) {
     int n;
     cout << "\t\t\tSemester: "; cin >> n; n = n - 1;
     cout << "\t\t\tEnter the ID of the course you want to adjust: ";
@@ -513,7 +513,7 @@ void updateCourse(Sem& se, Sem srr[]) {
     } while (menuOn);
 }
 
-void write_data_CourseList(Sem se, Sem srr[], int i, int year) {
+void write_data_CourseList(Sem srr[], int i, int year) {
     srr[i].cur = srr[i].head;
     ofstream ofs;
     ofs.open("CourseList.csv", ios::out);
@@ -539,7 +539,7 @@ void write_data_CourseList(Sem se, Sem srr[], int i, int year) {
     } ofs.close();
 }
 
-void write_data_course(Sem se, Sem srr[], int i, int year) {
+void write_data_course(Sem srr[], int i, int year) {
     srr[i].cur = srr[i].head;
     ofstream ofs;
     ofs.open("CourseList.txt", ios::out);
@@ -814,22 +814,71 @@ bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, 
 }
 
 //3
-void InputCourse(fstream& f, Sem& S, int& y);
-void EnrollCourse(Sem S, Course*& MyCourse);
-void ViewAvailableCourse(Sem S, int y);
-void ViewMyCourse(Sem S, int y, Course* MyCo);
-void DeleteCourse(Sem& S, Course*& MyCo);
-void OperateTask(Sem& S, Course*& MyCourse, int& y);
+
+//4
+void ViewMyCourseAfterRegistrationOver(Sem S, int y);
 
 //5
-void viewClass() {};
-void ViewStudentofClass(student* head);
+void ViewClass(ifstream myfile) {
+    string temp;
+    myfile.open("classes.txt");
+    if (myfile.eof() || !myfile.is_open()) {
+        cout << "List not available\n";
+        return;
+    }
+
+    getline(myfile, temp);//skip dong dau
+    while (!myfile.eof()) {
+        getline(myfile, temp);
+        cout << temp << endl;
+    }
+    myfile.close();
+}
+void ViewStudentofClass(student* head) {
+    string temp, check;
+    cout << "View student list of: ";
+    cin >> temp;
+
+    ifstream myfile;
+    myfile.open("classes.csv");
+    if (!myfile.is_open()) {
+        cout << "Cannot access list of classes\n";
+        return;
+    }
+
+    getline(myfile, check);//skip dong dau
+    while (!myfile.eof() && check != temp)
+        getline(myfile, check);
+
+    string display;
+    if (myfile.eof()) {
+        cout << "Class does not exist\n";
+        return;
+    }
+
+    ifstream classfile;
+    classfile.open(check + ".csv");
+    if (!classfile.is_open()) {
+        cout << "Class does not exist\n";
+        return;
+    }
+
+    while (!classfile.eof()) {
+        classfile >> display;
+        cout << display << " "; //no
+        classfile >> display;
+        cout << display << endl; //id
+        classfile >> display;
+        cout << display << " "; //first name
+        classfile >> display;
+        cout << display << endl << endl; //last name
+        classfile >> display; //skip 3 dong sau
+        classfile >> display;
+        classfile >> display;
+    }
+    myfile.close();
+    classfile.close();
+}
 void viewCourseStu() {};
 
 //6
-void exportClassList() {};
-void importScore() {};//(CSV) 1,20127062,Nguyen Khai Phu,8,10,7,5
-void viewCourseScore() {};
-void upScore() {};
-void viewClassScore() {};//Final scores, Sem GPA, overall GPA
-void viewStuScore() {};

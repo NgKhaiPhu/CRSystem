@@ -74,24 +74,26 @@ void add_class_list(string* severalclass);
 void create_school_year();
 
 //2 
-void TCmenu(Sem se, Sem srr[], int i, int year);
-void create_courselist(Sem& se, Sem srr[], int& i, int& year);
-void displayCourseList(Sem se, Sem srr[], int i, int year);
-void deleteCourse(Sem& se, Sem srr[]);
-void write_data_CourseList(Sem se, Sem srr[], int i, int year);
-void updateCourse(Sem& se, Sem srr[]);
+void TCmenu(Sem srr[], int i, int year);
+void create_courselist(Sem srr[], int& i, int& year);
+void displayCourseList(Sem srr[], int i, int year);
+void deleteCourse(Sem srr[]);
+void write_data_CourseList(Sem srr[], int i, int year);
+void updateCourse(Sem srr[]);
 bool checkRealTime(Sem srr[], int i);
 bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int* year);
 bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, int* hour, int* min);
-void write_data_course(Sem se, Sem srr[], int i, int year);
+void write_data_course(Sem srr[], int i, int year);
 
 //3
-void InputCourse(fstream& f, Sem& S, int& y);
-void EnrollCourse(Sem S, Course*& MyCourse);
-void ViewAvailableCourse(Sem S, int y);
-void ViewMyCourse(Sem S, int y, Course* MyCo);
-void DeleteCourse(Sem& S, Course*& MyCo);
-void OperateTask(Sem& S, Course*& MyCourse, int& y);
 
+//4 
+void ViewMyCourseAfterRegistrationOver(Sem S, int y);
+
+//5
+void ViewClass(ifstream myfile);
+void ViewStudentofClass(student* head);
+
+//6
 
 #endif
