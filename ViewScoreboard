@@ -1,0 +1,85 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+struct date
+{
+	int day;
+	int month;
+	int year;
+};
+
+struct student
+{
+	int no;
+	long int id;
+	string firstname;
+	string lastname;
+	string password;
+	string sclass;
+	string gender;
+	const int type = 0;
+	int socialid;
+	student* next;
+	date dob;
+};
+
+struct Course {
+	int no;
+	string CoId, CoName, teacherName;
+	int credit, maxSt = 50;
+	string day[2], s[2];
+	Course* next;
+	StuofCourse* SofC = nullptr;
+};
+
+struct Sem {
+	int year;
+	string SemStart;
+	string SemEnd;
+	string regisStart;
+	string regisEnd;
+	Course* head = nullptr;
+	Course* cur = nullptr;
+	Course s;
+};
+
+struct StuofCourse
+{
+	int StuEnroll;
+	student Stu;
+	StuofCourse* next;
+};
+
+//Them ViewAvailableCourse khi muon ViewScoreboard de xem CoId
+void ViewScoreboard(Course* Co)
+{
+	string CoID;
+	cout << "Please enter Course's ID: ";
+	cin >> CoID;
+	fstream f;
+	string filename;
+	filename = Co->CoId + "_Scoreboard.csv";
+	f.open(filename, ios::in);
+	while (f.good())
+	{
+		string No,StuID,Name,Total,Midterm,Final,Other;
+		getline(f, No, ',');
+		getline(f, StuID, ',');
+		getline(f, Name, ',');
+		getline(f, Total, ',');
+		getline(f, Final, ',');
+		getline(f, Midterm, ',');
+		getline(f, Other, '\n');
+		cout << setw(5) << No;
+		cout << setw(10) << StuID;
+		cout << setw(30) << Name;
+		cout << setw(5) << Total;
+		cout << setw(5) << Final;
+		cout << setw(5) << Midterm;
+		cout << setw(5) << Other<<endl;
+	}
+}
