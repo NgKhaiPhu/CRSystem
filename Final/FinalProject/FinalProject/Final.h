@@ -1,5 +1,6 @@
 #ifndef _FINAL_H_
 #define _FINAL_H_
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <string>
@@ -26,6 +27,10 @@ struct student
 	string password;
 	string sclass;
 	string gender;
+	float totalmark;
+	float finalmark;
+	float midtermmark;
+	float orthermark;
 	const int type = 0;
 	int socialid;
 	student* next;
@@ -61,8 +66,17 @@ struct Sem {
 	Course s;
 };
 
+struct course_class
+{
+	string data;
+	course_class* next;
+};
+
+
+//main menu
+//log in
 void inputAcc(fstream& acc, student*& stuAcc, staff*& staAcc);
-void login(student* stuAcc, staff* staAcc, string& usn, student*& stuCur, staff*& staCur);
+void login(student* stuAcc, staff* staAcc, student*& stuCur, staff*& staCur, bool& exit);
 void displayBasicInfo(student* stuCur, staff* staCur);
 void changepass(student* stuAcc, staff* staAcc, student* stuCur, staff* staCur);
 
@@ -80,7 +94,7 @@ void displayCourseList(Sem srr[], int i, int year);
 void deleteCourse(Sem srr[]);
 void write_data_CourseList(Sem srr[], int i, int year);
 void updateCourse(Sem srr[]);
-bool checkRealTime(Sem srr[], int i);
+int checkRealTime(Sem srr[], int i);
 bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int* year);
 bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, int* hour, int* min);
 void write_data_course(Sem srr[], int i, int year);
@@ -95,5 +109,10 @@ void ViewClass(ifstream myfile);
 void ViewStudentofClass(student* head);
 
 //6
+string choose_class();
+void load_stu_course_class(student*& head, string* classs);
+void export_student_in_courses(student* head, string* classs);
+void delete_linked_list(student*& head);
+void import_stu_mark();
 
 #endif
