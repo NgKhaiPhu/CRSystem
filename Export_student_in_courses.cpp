@@ -39,7 +39,8 @@ struct course_class
 string choose_class();
 void load_stu_course_class(student*& head, string* classs);
 void export_student_in_courses(student* head, string* classs);
-
+void delete_linked_list(student*& head);
+void import_stu_mark();
 int main()
 {
 	student* head = nullptr;
@@ -47,7 +48,9 @@ int main()
 
 	load_stu_course_class(head, &classs);
 	export_student_in_courses(head, &classs);
+	import_stu_mark();
 
+	return 0;
 }
 
 
@@ -69,7 +72,6 @@ void export_student_in_courses(student* head, string* classs)
 			output << head->lastname << ",";
 			output << head->gender << ",";
 			output << head->dob.day << "/" << head->dob.month << "/" << head->dob.year << ",";
-			output << head->sclass << ",";
 			output << head->socialid << ",";
 			output << ",,," << endl;
 			
@@ -179,5 +181,95 @@ void load_stu_course_class(student*& head,string* classs)
 
 	}
 	data.close();
+}
+
+void delete_linked_list(student*& head)
+{
+	student* current = head;
+	while (head != nullptr)
+	{
+		head = head->next;
+		delete current;
+		current = head;
+	}
+}
+
+void import_stu_mark()
+{
+	student* head = nullptr,*current=nullptr;
+	string classs = choose_class();
+	string* temp = &classs;
+	cout << "Enter the address of mark file: ";
+	while (getchar() != '\n');
+	string a; getline(cin, a);
+	fstream import;
+
+	char tempp;
+	import.open(a, fstream::in);
+	import.ignore(100000, '\n');
+	while (!import.eof())
+	{
+		student* add = new student;
+		import >> add->no;
+		if (add->no < 0)break; import >> tempp; 
+		import >> add->id; import >> tempp;
+		getline(import, add->firstname, ',');
+		getline(import, add->lastname, ',');
+		getline(import, add->gender, ',');
+		import >> add->dob.day;import >> tempp;
+		import >> add->dob.month;import >> tempp;
+		import >> add->dob.year;import >> tempp;
+		import >> add->socialid; import >> tempp;
+		import >> add->midtermmark; import >> tempp;
+		import >> add->finalmark; import >> tempp;
+		import >> add->orthermark; import >> tempp;
+		import >> add->totalmark; 
+		import.ignore();
+
+		
+		if (head == nullptr)
+		{
+			head = add;
+			current = head;
+		}
+		else
+		{
+			current->next = add;
+			current = current->next;
+		}
+		current->next = nullptr;
+	}
+
+	import.close();
+
+
+	current = head;
+
+
+
+
+	fstream storage;
+	storage.open((*temp + "_math.csv").c_str(), fstream::out);
+	storage << "No" << "," << "Student ID" << ',' << "First Name" << "," << "Last Name" << "," << "Gender" << ", " << "Date of Birth" << ", " << "Social ID" << "," << "Midterm Mark" << "," << "Final Mark" << "," << "Other Mark" << "," << "Total Mark" << endl;
+	while (current != nullptr)
+	{
+		storage << current->no << ",";
+		storage << current->id << ",";
+		storage << current->firstname << ",";
+		storage << current->lastname << ",";
+		storage << current->gender << ",";
+		storage << current->dob.day << "/" << current->dob.month << "/" << current->dob.year << ",";
+		storage << current->socialid << ",";
+		storage << current->midtermmark << ",";
+		storage << current->finalmark << ",";
+		storage << current->orthermark << ",";
+		storage << current->totalmark;
+		if (current->next!=nullptr) storage << endl;
+		current = current->next;
+	}
+	storage.close();
+
+
+	delete_linked_list(head);
 }
 
