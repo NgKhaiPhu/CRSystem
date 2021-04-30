@@ -5,6 +5,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <ctime>
+#include <iomanip>
 
 using namespace std;
 
@@ -18,8 +20,7 @@ struct date
 struct student
 {
 	int no;
-	int id;
-	string username;
+	long int id;
 	string firstname;
 	string lastname;
 	string password;
@@ -42,15 +43,13 @@ struct staff
 };
 
 struct Course {
-	int CoId;
-	string CoName;
-	string teacherName;
-	int credit;
-	int maxSt = 50;
-	string day[2];
-	string s[2];
+	int no;
+	string CoId, CoName, teacherName;
+	int credit, maxSt = 50;
+	string day[2], s[2];
 	Course* next;
 };
+
 struct Sem {
 	int year;
 	string SemStart;
@@ -59,18 +58,13 @@ struct Sem {
 	string regisEnd;
 	Course* head = nullptr;
 	Course* cur = nullptr;
+	Course s;
 };
 
-void inputAcc(fstream& acc, student*& stu, staff*& sta);
-void login(student* stu, string& usn);
-void deleteList(student*& stu);
-void display(ifstream& ifs, string u);
-void changepass(fstream& fs, string u, student* stu);
-
-//realtime
-void takeRealTime(string SemStart, string SemEnd, string ReStart, string ReEnd);
-bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int* year);
-bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, int* hour, int* min);
+void inputAcc(fstream& acc, student*& stuAcc, staff*& staAcc);
+void login(student* stuAcc, staff* staAcc, string& usn, student*& stuCur, staff*& staCur);
+void displayBasicInfo(student* stuCur, staff* staCur);
+void changepass(student* stuAcc, staff* staAcc, student* stuCur, staff* staCur);
 
 //1
 bool check_file_exist(string* file);
@@ -80,10 +74,16 @@ void add_class_list(string* severalclass);
 void create_school_year();
 
 //2 
-void TCmenu(Sem se, Sem srr[], int i, int year, int season);
-void create_courselist(Sem& se, Sem srr[], int& i, int& year, int& season);
-void displayCourseList(Sem se, Sem srr[], int i, int year, int season);
-void deleteCourse(Sem& se, Sem srr[], int i);
+void TCmenu(Sem se, Sem srr[], int i, int year);
+void create_courselist(Sem& se, Sem srr[], int& i, int& year);
+void displayCourseList(Sem se, Sem srr[], int i, int year);
+void deleteCourse(Sem& se, Sem srr[]);
+void write_data_CourseList(Sem se, Sem srr[], int i, int year);
+void updateCourse(Sem& se, Sem srr[]);
+bool checkRealTime(Sem srr[], int i);
+bool isInSem(string SemStart, string SemEnd, tm* t, int* day, int* mon, int* year);
+bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, int* hour, int* min);
+void write_data_course(Sem se, Sem srr[], int i, int year);
 
 //3
 void InputCourse(fstream& f, Sem& S, int& y);
