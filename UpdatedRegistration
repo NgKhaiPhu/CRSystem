@@ -22,7 +22,7 @@ struct student
 	string sclass;
 	string gender;
 	const int type = 0;
-	int socialid;
+	string socialid;
 	student* next;
 	date dob;
 };
@@ -50,12 +50,12 @@ struct Sem {
 struct StuofCourse
 {
 	int StuEnroll;//num of Students enrolling to course right now;
-	student Stu;
-	StuofCourse* next;
+	student *Stu;
 };
 
 void InputMyCourse(fstream& f, Course* MyCo, int &n, student Student)
 {
+	fstream fSoC;
 	string filename;
 	filename = to_string(Student.id) + "_Courses.txt";
 	f.open(filename, fstream::in);
@@ -89,6 +89,38 @@ void InputMyCourse(fstream& f, Course* MyCo, int &n, student Student)
 		f >> pcur->day[1];
 		f >> pcur->s[1];
 		pcur->next = nullptr;
+
+		filename = pcur->CoId + ".txt";
+		fSoC.open(filename, fstream::in);
+		pcur->SofC = nullptr;
+		f >> pcur->SofC->StuEnroll;
+		student* ptmp;
+		while (!fSoC.eof())
+		{
+			if (pcur->SofC->Stu == nullptr)
+			{
+				pcur->SofC->Stu = new student;
+				ptmp = pcur->SofC->Stu;
+			}
+			else
+			{
+				ptmp->next = new student;
+				ptmp = ptmp->next;
+			}
+			fSoC >> ptmp->no;
+			fSoC >> ptmp->id;
+			fSoC >> ptmp->firstname;
+			fSoC >> ptmp->lastname;
+			fSoC >> ptmp->gender;
+			fSoC >> ptmp->dob.day;
+			fSoC >> ptmp->dob.month;
+			fSoC >> ptmp->dob.year;
+			fSoC >> ptmp->socialid;
+			ptmp->next = nullptr;
+		}
+		pcur->next = nullptr;
+
+		fSoC.close();
 	}
 	f.close();
 }
@@ -136,28 +168,28 @@ void InputAvailCourse( Sem& S, int& y, Course* MyCo)
 		fSoC.open(filename, fstream::in);
 		pcur->SofC = nullptr;
 		f >>  pcur->SofC->StuEnroll;
-		StuofCourse *ptmp ;
+		student *ptmp ;
 		while (!fSoC.eof())
 		{
-			if (pcur->SofC == nullptr)
+			if (pcur->SofC->Stu == nullptr)
 			{
-				pcur->SofC = new StuofCourse;
-				ptmp = pcur->SofC;
+				pcur->SofC->Stu = new student;
+				ptmp = pcur->SofC->Stu;
 			}
 			else
 			{
-				ptmp->next = new StuofCourse;
+				ptmp->next = new student;
 				ptmp = ptmp->next;
 			}
-			fSoC >> ptmp->Stu.no;
-			fSoC >> ptmp->Stu.id;
-			fSoC >> ptmp->Stu.firstname;
-			fSoC >> ptmp->Stu.lastname ;
-			fSoC >> ptmp->Stu.gender;
-			fSoC >> ptmp->Stu.dob.day;
-			fSoC >> ptmp->Stu.dob.month;
-			fSoC >> ptmp->Stu.dob.year;
-			fSoC >> ptmp->Stu.socialid;
+			fSoC >> ptmp->no;
+			fSoC >> ptmp->id;
+			fSoC >> ptmp->firstname;
+			fSoC >> ptmp->lastname ;
+			fSoC >> ptmp->gender;
+			fSoC >> ptmp->dob.day;
+			fSoC >> ptmp->dob.month;
+			fSoC >> ptmp->dob.year;
+			fSoC >> ptmp->socialid;
 			ptmp->next=nullptr;
 		}
 		pcur->next = nullptr;
@@ -235,20 +267,28 @@ void EnrollCourse(Sem S, Course*& MyCourse, int& count,student Student) // S la 
 
 void AddStutoCourse(Course* MyCo, student Student)
 {
-	StuofCourse* pCur = MyCo->SofC;
-	while (pCur->next != nullptr)	pCur = pCur->next;
-	pCur->next = new StuofCourse;
-	pCur = pCur->next;
-	pCur->StuEnroll++;
-	pCur->Stu.id = Student.id;
-	pCur->Stu.dob.day = Student.dob.day;
-	pCur->Stu.firstname = Student.firstname;
-	pCur->Stu.lastname = Student.lastname ;
-	pCur->Stu.gender = Student.gender;
-	pCur->Stu.dob.month = Student.dob.month;
-	pCur->Stu.dob.year = Student.dob.year;
-	pCur->Stu.socialid = Student.socialid;
-	pCur->Stu.no = Student.no;
+	student* pCur = MyCo->SofC->Stu;
+	if (MyCo->SofC == nullptr)
+	{
+		MyCo->SofC->Stu = new student;
+		pCur = MyCo->SofC->Stu;
+	}
+	else
+	{
+		while (pCur->next != nullptr)	pCur = pCur->next;
+		pCur->next = new student;
+		pCur = pCur->next;
+	}
+	MyCo->SofC->StuEnroll++;
+	pCur->id = Student.id;
+	pCur->dob.day = Student.dob.day;
+	pCur->firstname = Student.firstname;
+	pCur->lastname = Student.lastname ;
+	pCur->gender = Student.gender;
+	pCur->dob.month = Student.dob.month;
+	pCur->dob.year = Student.dob.year;
+	pCur->socialid = Student.socialid;
+	pCur->no = Student.no;
 }
 
 void ViewAvailableCourse(Sem S, int y)
@@ -380,17 +420,17 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count,student Student)
 void RemoveStuofCo(Course*& MyCo,student Student)
 {
 	int x = Student.id;
-	StuofCourse* pCur = MyCo->SofC;
+	student* pCur = MyCo->SofC->Stu;
 	
-	if (MyCo->SofC->Stu.id == x) {
-		MyCo->SofC = MyCo->SofC->next;
+	if (MyCo->SofC->Stu->id == x) {
+		MyCo->SofC->Stu = MyCo->SofC->Stu->next;
 		delete pCur;
 		return;
 	}
 
 	while (pCur->next != nullptr) {
-		if (pCur->next->Stu.id == x) {
-			StuofCourse* temp = pCur->next;
+		if (pCur->next->id == x) {
+			student* temp = pCur->next;
 			pCur->next = pCur->next->next;
 			delete temp;
 			return;
@@ -446,8 +486,8 @@ void DeleteList(Course*& MyCo, Sem& S)
 	{
 		while (MyCo->SofC != nullptr)
 		{
-			StuofCourse* pTmp1 = MyCo->SofC;
-			MyCo->SofC = MyCo->SofC->next;
+			student* pTmp1 = MyCo->SofC->Stu;
+			MyCo->SofC->Stu = MyCo->SofC->Stu->next;
 			delete pTmp1;
 		}
 		Course* pTmp = MyCo;
@@ -458,8 +498,8 @@ void DeleteList(Course*& MyCo, Sem& S)
 	{
 		while (S.head->SofC != nullptr)
 		{
-			StuofCourse* pTmp1 = S.head->SofC;
-			S.head->SofC = S.head->SofC->next;
+			student* pTmp1 = S.head->SofC->Stu;
+			S.head->SofC->Stu = S.head->SofC->Stu->next;
 			delete pTmp1;
 		}
 		Course* pTmp = S.head;
@@ -509,17 +549,17 @@ void StoreStusofCourse(Course* MyCourse, fstream& f, student Student)
 	}
 	f << MyCourse->SofC->StuEnroll;
 	int count = MyCourse->SofC->StuEnroll;
-	StuofCourse* pCur = MyCourse->SofC;
+	student* pCur = MyCourse->SofC->Stu;
 	while (count != 0)
 	{
-		f << pCur->Stu.id << " ";
-		f << pCur->Stu.firstname <<" ";
-		f << pCur->Stu.lastname  << " ";
-		f << pCur->Stu.gender << " ";
-		f << pCur->Stu.dob.day << " ";
-		f << pCur->Stu.dob.month << " ";
-		f << pCur->Stu.dob.year << " ";
-		f << pCur->Stu.socialid << " ";
+		f << pCur->id << " ";
+		f << pCur->firstname <<" ";
+		f << pCur->lastname  << " ";
+		f << pCur->gender << " ";
+		f << pCur->dob.day << " ";
+		f << pCur->dob.month << " ";
+		f << pCur->dob.year << " ";
+		f << pCur->socialid << " ";
 		count--;
 		f << endl;
 		pCur = pCur->next;
