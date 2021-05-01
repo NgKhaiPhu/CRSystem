@@ -22,7 +22,7 @@ struct student
 	string sclass;
 	string gender;
 	const int type = 0;
-	int socialid;
+	string socialid;
 	student* next;
 	date dob;
 };
@@ -50,11 +50,11 @@ struct Sem {
 struct StuofCourse
 {
 	int StuEnroll;//num of Students enrolling to course right now;
-	student Stu;
-	StuofCourse* next;
+	student* Stu;
+
 };
 
-void InputAvailCourse(Sem& S, int& y, Course* MyCo)
+void InputAvailCourse2(Sem& S, int& y, Course* MyCo)
 {
 	fstream f, fSoC;
 	f.open("AvailCourse.txt", fstream::in);
@@ -97,28 +97,28 @@ void InputAvailCourse(Sem& S, int& y, Course* MyCo)
 		fSoC.open(filename, fstream::in);
 		pcur->SofC = nullptr;
 		f >> pcur->SofC->StuEnroll;
-		StuofCourse* ptmp;
+		student* ptmp;
 		while (!fSoC.eof())
 		{
-			if (pcur->SofC == nullptr)
+			if (pcur->SofC->Stu == nullptr)
 			{
-				pcur->SofC = new StuofCourse;
-				ptmp = pcur->SofC;
+				pcur->SofC->Stu = new student;
+				ptmp = pcur->SofC->Stu;
 			}
 			else
 			{
-				ptmp->next = new StuofCourse;
+				ptmp->next = new student;
 				ptmp = ptmp->next;
 			}
-			fSoC >> ptmp->Stu.no;
-			fSoC >> ptmp->Stu.id;
-			fSoC >> ptmp->Stu.firstname;
-			fSoC >> ptmp->Stu.lastname;
-			fSoC >> ptmp->Stu.gender;
-			fSoC >> ptmp->Stu.dob.day;
-			fSoC >> ptmp->Stu.dob.month;
-			fSoC >> ptmp->Stu.dob.year;
-			fSoC >> ptmp->Stu.socialid;
+			fSoC >> ptmp->no;
+			fSoC >> ptmp->id;
+			fSoC >> ptmp->firstname;
+			fSoC >> ptmp->lastname;
+			fSoC >> ptmp->gender;
+			fSoC >> ptmp->dob.day;
+			fSoC >> ptmp->dob.month;
+			fSoC >> ptmp->dob.year;
+			fSoC >> ptmp->socialid;
 			ptmp->next = nullptr;
 		}
 		pcur->next = nullptr;
@@ -179,8 +179,8 @@ void ViewStudentsofCourse(Sem S)
 		return;
 	}
 	int count = 0;
-	StuofCourse* pC = S.head->SofC;
-	cout << endl << "There are "<< pC->StuEnroll << "students of the course you want to view: \n";
+	student* pC = S.head->SofC->Stu;
+	cout << endl << "There are "<< S.head->SofC->StuEnroll << "students of the course you want to view: \n";
 	cout << setw(5) << "No";
 	cout << setw(5) << "ID";
 	cout << setw(15) << "First Name";
@@ -190,11 +190,11 @@ void ViewStudentsofCourse(Sem S)
 	while (pC != nullptr)
 	{
 		cout << setw(5)<<count++;
-		cout << setw(5) << pC->Stu.id;
-		cout << setw(15) << pC->Stu.firstname;
-		cout << setw(15) << pC->Stu.lastname;
-		cout << setw(5) << pC->Stu.gender;
-		cout << setw(5) << pC->Stu.dob.day<<"/"<<pC->Stu.dob.month<<"/"<<pC->Stu.dob.year<<endl;
+		cout << setw(5) << pC->id;
+		cout << setw(15) << pC->firstname;
+		cout << setw(15) << pC->lastname;
+		cout << setw(5) << pC->gender;
+		cout << setw(5) << pC->dob.day<<"/"<<pC->dob.month<<"/"<<pC->dob.year<<endl;
 		pC = pC->next ;
 	}
 }
