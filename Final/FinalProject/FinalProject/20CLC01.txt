@@ -1,0 +1,60 @@
+1 20121215
+Nguyen Thi Truc
+Linh
+female
+12/2/2002
+312512329212
+2 20121216
+Tran Minh
+Tuan
+male
+5/8/2002
+312512329221
+3 20121217
+Huynh Thi Truc
+Giang
+female
+12/5/2002
+312512329252
+4 20121218
+Nguyen Thi Kim
+Xuyen
+female
+3/2/2002
+312512329236
+5 20121219
+Nguyen Van Tuan
+Kiet
+male
+5/9/2002
+312512329248
+6 20121220
+Bui Thi Huyen
+Linh
+female
+21/12/2002
+312512329257
+7 20121221
+Cao Tan
+Phat
+male
+15/2/2002
+312512329261
+8 20121222
+Ngo Van Anh
+Kim
+female
+14/5/2002
+312512329276
+9 20121223
+Nguyen Thi Nhat
+Linh
+female
+3/1/2002
+312512329284
+10 20121224
+Nguyen Thi Kieu
+My
+female
+2/6/2002
+312512329295
