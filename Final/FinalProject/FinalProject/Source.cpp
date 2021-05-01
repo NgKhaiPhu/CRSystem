@@ -17,8 +17,8 @@ int main() {
 
 	//login
 	bool exit = false;
-	int year, i;
-	Sem srr[3];
+	int year = 0, i = 0;
+	Sem* srr = new Sem[3];
 
 	do {
 		system("CLS");
@@ -33,6 +33,7 @@ int main() {
 		bool logout = false;
 		if (staUsing) {
 			do {
+				system("CLS");
 				displayBasicInfo(stuUsing, staUsing);
 				cout << "--------------------------";
 				cout << "Press 0 to log out\n"
@@ -49,14 +50,15 @@ int main() {
 				case 1:
 					create_school_year;
 					break;
-				case 2:
+				case 2: {
 					student* list = 0;
 					create_class(list);
-					break;
+					break; }
 				case 3:
 					TCmenu(srr, i, year);
 					break;
-				case 4://to be khong tinh yeu
+				case 4:
+					menuView(srr, i, year);
 					break;
 				case 5: 
 				{
@@ -76,31 +78,22 @@ int main() {
 		}
 		else {
 			do {
+				system("CLS");
 				displayBasicInfo(stuUsing, staUsing);
 				cout << "--------------------------";
 				cout << "Press 0 to log out\n"
-					<< setw(6) << " " << "1 to enroll a course\n"
-					<< setw(6) << " " << "2 to view list of courses you have enrolled\n"
-					<< setw(6) << " " << "3 to remove a course you have enrolled\n"
-					<< setw(6) << " " << "4 to view your score\n";
+					<< setw(6) << " " << "1 to go to Course\n"
+					<< setw(6) << " " << "2 to view your score\n";
 				cin >> opt;
 				switch (opt) {
 				case 0:
 					logout = true;
 					break;
 				case 1: 
-					if (checkRealTime(srr,i) == 1){
-						//mai lam, phan cua Nien
-					}
-					break;
+					OperateTask(srr, stuUsing, i);
+						break; 
 				case 2:
-					//mai lam, phan cua Nien
-					break;
-				case 3:
-					//mai lam, phan cua Nien
-					break;
-				case 4:
-					//mai lam
+					//mai lam, phan cua Thinh
 					break;
 				default:
 					cout << "Invalid option. Please enter again\n";
@@ -109,5 +102,23 @@ int main() {
 			} while (!logout);
 		}
 	} while (!exit);
+
+	//delete
+	student* stucur = stuAcc;
+	while (stuAcc->next) {
+		stuAcc = stuAcc->next;
+		delete stucur;
+		stucur = stuAcc;
+	}
+
+	staff* stacur = staAcc;
+	while (staAcc->next) {
+		staAcc = staAcc->next;
+		delete stacur;
+		stacur = staAcc;
+	}
+
+	delete[]srr;
+
 	return 0;
 }

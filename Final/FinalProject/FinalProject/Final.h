@@ -32,8 +32,8 @@ struct student
 	float midtermmark;
 	float orthermark;
 	const int type = 0;
-	int socialid;
-	student* next;
+	string socialid;
+	student* next = 0;
 	date dob;
 };
 
@@ -44,7 +44,14 @@ struct staff
 	string password;
 	string username;
 	const int type = 1;
-	staff* next;
+	staff* next = 0;
+};
+
+struct StuofCourse
+{
+	int StuEnroll;//num of Students enrolling to course right now;
+	student Stu;
+	StuofCourse* next = 0;
 };
 
 struct Course {
@@ -52,7 +59,8 @@ struct Course {
 	string CoId, CoName, teacherName;
 	int credit, maxSt = 50;
 	string day[2], s[2];
-	Course* next;
+	Course* next = 0;
+	StuofCourse* SofC = 0;
 };
 
 struct Sem {
@@ -69,11 +77,9 @@ struct Sem {
 struct course_class
 {
 	string data;
-	course_class* next;
+	course_class* next = 0;
 };
 
-
-//main menu
 //log in
 void inputAcc(fstream& acc, student*& stuAcc, staff*& staAcc);
 void login(student* stuAcc, staff* staAcc, student*& stuCur, staff*& staCur, bool& exit);
@@ -90,7 +96,7 @@ void create_school_year();
 //2 
 void TCmenu(Sem srr[], int i, int year);
 void create_courselist(Sem srr[], int& i, int& year);
-void displayCourseList(Sem srr[], int i, int year);
+void displayCourseList(Sem srr[], int i, int year);//4
 void deleteCourse(Sem srr[]);
 void write_data_CourseList(Sem srr[], int i, int year);
 void updateCourse(Sem srr[]);
@@ -100,13 +106,28 @@ bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, 
 void write_data_course(Sem srr[], int i, int year);
 
 //3
+void InputMyCourse(fstream& f, Course*& MyCo, int& n, student* Student);
+void InputAvailCourse(Sem& S, Course* MyCo);
+void EnrollCourse(Sem S, Course*& MyCourse, int& count, student* Student, fstream& fSoC); // S la hoc ki voi cac course dc staff nhap vao
+void AddStutoCourse(Course*& MyCo, student* Student);
+void ViewAvailableCourse(Sem S, int i);
+void RemoveAlreadyCourses(Course*& pHead, int k);
+void ViewMyCourse(Sem S, int i, Course* MyCo);
+void DeleteCourse(Sem& S, Course*& MyCo, int& count, student *Student, fstream& fSoC);
+void RemoveStuofCo(Course*& MyCo, student* Student);
+void OperateTask(Sem srr[], student* Student, int i);
+void DeleteList(Course*& MyCo, Sem& S);
+void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, student* Student);
+void StoreStusofCourse(Course* MyCourse, fstream& f);
 
 //4 
-void ViewMyCourseAfterRegistrationOver(Sem S, int y);
+void ViewMyCourseAfterRegistrationOver(Sem srr[], int i);
 
 //5
+void menuView(Sem srr[], int i, int year);
 void ViewClass(ifstream myfile);
 void ViewStudentofClass(student* head);
+void ViewStudentsofCourse(Sem S);
 
 //6
 string choose_class();
