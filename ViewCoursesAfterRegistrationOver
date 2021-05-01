@@ -4,74 +4,90 @@
 #include <sstream>
 #include <iomanip>
 using namespace std;
+struct date
+{
+	int day;
+	int month;
+	int year;
+};
+
+struct student
+{
+	int no;
+	long int id;
+	string firstname;
+	string lastname;
+	string password;
+	string sclass;
+	string gender;
+	const int type = 0;
+	int socialid;
+	student* next;
+	date dob;
+};
+
 struct Course {
-	int CoID;
-	int stt;
-	string CoName;
-	string TeacherName;
-	int Credit;
-	int NumofStu = 50;
-	string* Dayofweek;
-	string* Session;
-	Course* nxt;
+	int no;
+	string CoId, CoName, teacherName;
+	int credit, maxSt = 50;
+	string day[2], s[2];
+	Course* next;
+	StuofCourse* SofC = nullptr;
 };
 
 struct Sem {
-	int sem;
+	int year;
 	string SemStart;
 	string SemEnd;
-	Course* C;
-}; 
-
-struct StuInfo
-{
-	int No;
-	int StuID;
-	char* FirstName;
-	char* LastName;
-	char Gender;
-	int day, month, year;
-	long long int SocialID;
+	string regisStart;
+	string regisEnd;
+	Course* head = nullptr;
+	Course* cur = nullptr;
+	Course s;
 };
 
-void InputMyCourse(fstream& f, Sem S, int& n, StuInfo Student)
+struct StuofCourse
+{
+	int StuEnroll;//num of Students enrolling to course right now;
+	student Stu;
+	StuofCourse* next;
+};
+
+void InputMyCourse(fstream& f, Course* MyCo, int& n, student Student)
 {
 	string filename;
-	filename = to_string(Student.StuID) + ".txt";
+	filename = to_string(Student.id) + "_Courses.txt";
 	f.open(filename, fstream::in);
-	int count = n;
-	Course* pcur = S.C;
+	f >> n;
+	Course* pcur = MyCo;
 	if (f.fail())
 	{
 		cout << "Can't open Student's Courses file.\n";
 		return;
 	}
-	while (count <= 0)
+	while (!f.eof())
 	{
-		if (S.C == nullptr)
+		if (MyCo == nullptr)
 		{
-			S.C = new Course;
-			pcur = S.C;
+			MyCo = new Course;
+			pcur = MyCo;
 		}
 		else
 		{
-			pcur->nxt = new Course;
-			pcur = pcur->nxt;
+			pcur->next = new Course;
+			pcur = pcur->next;
 		}
-		pcur->Dayofweek = new string[2];
-		pcur->Session = new string[2];
-		f >> pcur->stt;
-		f >> pcur->CoID;
+		f >> pcur->no;
+		f >> pcur->CoId;
 		f >> pcur->CoName;
-		f >> pcur->TeacherName;
-		f >> pcur->Credit;
-		f >> pcur->NumofStu;
-		f >> pcur->Dayofweek[0];
-		f >> pcur->Session[0];
-		f >> pcur->Dayofweek[1];
-		f >> pcur->Session[1];
-		pcur->nxt = nullptr;
-		count--;
+		f >> pcur->teacherName;
+		f >> pcur->credit;
+		f >> pcur->maxSt;
+		f >> pcur->day[0];
+		f >> pcur->s[0];
+		f >> pcur->day[1];
+		f >> pcur->s[1];
+		pcur->next = nullptr;
 	}
 	f.close();
 }
@@ -79,7 +95,7 @@ void InputMyCourse(fstream& f, Sem S, int& n, StuInfo Student)
 void ViewMyCourseAfterRegistrationOver(Sem S, int y)
 {
 	cout << setfill(' ');
-	cout << "Course List of Sem " << S.sem + 1 << " in the year of " << y << " ,which from ";
+	cout << "Course List of Sem " << S.year + 1 << " in the year of " << y << " ,which from ";
 	cout << S.SemStart << " to " << S.SemEnd << endl;
 	cout << "==========================================================================================" << endl;
 	cout << setw(5) << "ID";
@@ -89,20 +105,20 @@ void ViewMyCourseAfterRegistrationOver(Sem S, int y)
 	cout << setw(5) << "Maximum";
 	cout << setw(15) << "Day";
 	cout << setw(15) << "Sesson";
-	if (S.C == nullptr) return;
-	Course* pC = S.C;
+	if (S.head == nullptr) return;
+	Course* pC = S.head;
 	while (pC != nullptr)
 	{
 		cout << endl;
-		cout << setw(5) << pC->CoID;
+		cout << setw(5) << pC->CoId;
 		cout << setw(15) << pC->CoName;
-		cout << setw(15) << pC->TeacherName;
-		cout << setw(5) << pC->Credit;
-		cout << setw(5) << pC->NumofStu;
-		cout << setw(15) << pC->Dayofweek[0];
-		cout << setw(15) << pC->Session[0];
-		cout << endl << setw(89) << pC->Dayofweek[1];
-		cout << endl << setw(15) << pC->Session[1];
-		pC = pC->nxt;
+		cout << setw(15) << pC->teacherName;
+		cout << setw(5) << pC->credit;
+		cout << setw(5) << pC->maxSt;
+		cout << setw(15) << pC->day[0];
+		cout << setw(15) << pC->s[0];
+		cout << endl << setw(89) << pC->day[1];
+		cout << endl << setw(15) << pC->s[1];
+		pC = pC->next;
 	}
 }
