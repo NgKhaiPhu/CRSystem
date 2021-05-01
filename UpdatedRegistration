@@ -59,14 +59,14 @@ void InputMyCourse(fstream& f, Course* MyCo, int &n, student Student)
 	string filename;
 	filename = to_string(Student.id) + "_Courses.txt";
 	f.open(filename, fstream::in);
-	int count = n;
+	f >> n;
 	Course* pcur = MyCo;
 	if (f.fail())
 	{
 		cout << "Can't open Student's Courses file.\n";
 		return;
 	}
-	while (count <= 0)
+	while (!f.eof())
 	{
 		if (MyCo == nullptr)
 		{
@@ -89,7 +89,6 @@ void InputMyCourse(fstream& f, Course* MyCo, int &n, student Student)
 		f >> pcur->day[1];
 		f >> pcur->s[1];
 		pcur->next = nullptr;
-		count--;
 	}
 	f.close();
 }
