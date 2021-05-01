@@ -50,8 +50,7 @@ struct staff
 struct StuofCourse
 {
 	int StuEnroll;//num of Students enrolling to course right now;
-	student Stu;
-	StuofCourse* next = 0;
+	student *Stu;
 };
 
 struct Course {
@@ -125,8 +124,8 @@ void ViewMyCourseAfterRegistrationOver(Sem srr[], int i);
 
 //5
 void menuView(Sem srr[], int i, int year);
-void ViewClass(ifstream myfile);
-void ViewStudentofClass(student* head);
+void ViewClass();
+void ViewStudentofClass();
 void ViewStudentsofCourse(Sem S);
 
 //6
@@ -135,5 +134,7 @@ void load_stu_course_class(student*& head, string* classs);
 void export_student_in_courses(student* head, string* classs);
 void delete_linked_list(student*& head);
 void import_stu_mark();
+void view_class_score();
+void view_owner_score();
 
 #endif

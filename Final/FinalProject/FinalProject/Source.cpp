@@ -35,10 +35,10 @@ int main() {
 			do {
 				system("CLS");
 				displayBasicInfo(stuUsing, staUsing);
-				cout << "--------------------------";
+				cout << "--------------------------\n";
 				cout << "Press 0 to log out\n"
 					<< setw(6) << " " << "1 to add a school year\n"
-					<< setw(6) << " " << "2 to add a semester\n"
+					<< setw(6) << " " << "2 to create a new class\n"
 					<< setw(6) << " " << "3 to go to Course\n"
 					<< setw(6) << " " << "4 to go to View\n"
 					<< setw(6) << " " << "5 to export list of student from a course\n";					
@@ -48,9 +48,11 @@ int main() {
 					logout = true;
 					break;
 				case 1:
-					create_school_year;
+					system("CLS");
+					create_school_year();
 					break;
 				case 2: {
+					system("CLS");
 					student* list = 0;
 					create_class(list);
 					break; }
@@ -64,7 +66,7 @@ int main() {
 				{
 					student* head = nullptr;
 					string classs = choose_class();// Chon lop de export file
-
+					system("CLS");
 					load_stu_course_class(head, &classs);
 					export_student_in_courses(head, &classs);
 					import_stu_mark();
@@ -72,15 +74,20 @@ int main() {
 				}
 				default:
 					cout << "Invalid option. Please enter again\n";
+					system("pause");
 					break;
 				}
 			} while (!logout);
 		}
 		else {
+			string filename = to_string(stuUsing->id) + "_Courses.txt";
+			ofstream f;
+			f.open(filename, fstream::app);
+			f.close();
 			do {
 				system("CLS");
 				displayBasicInfo(stuUsing, staUsing);
-				cout << "--------------------------";
+				cout << "--------------------------\n";
 				cout << "Press 0 to log out\n"
 					<< setw(6) << " " << "1 to go to Course\n"
 					<< setw(6) << " " << "2 to view your score\n";
@@ -97,6 +104,7 @@ int main() {
 					break;
 				default:
 					cout << "Invalid option. Please enter again\n";
+					system("pause");
 					break;
 				}
 			} while (!logout);
