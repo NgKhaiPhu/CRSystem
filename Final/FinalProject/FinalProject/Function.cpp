@@ -708,7 +708,11 @@ bool isInSem(string SeStart, string SeEnd, tm* t, int* day, int* mon, int* year)
         default: continue;
         };
     }
+    cout << "SE start: " << day[0] << "/" << mon[0] << "/" << year[0] << endl;
+    cout << "SE computer: " << t->tm_mday << "/" << 1 + t->tm_mon << "/" << 1900 + t->tm_year << endl;
+    cout << "SE end: " << day[1] << "/" << mon[1] << "/" << year[1] << endl;
 
+    cout << endl;
     if (1900 + t->tm_year < year[0] || 1900 + t->tm_year > year[1]) return false;
     else if (1 + t->tm_mon < mon[0] || 1 + t->tm_mon > mon[1]) return false;
     else if (t->tm_mday < day[0] || t->tm_mday > day[1]) return false;
@@ -826,19 +830,25 @@ bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, 
         default: continue;
         };
     }
+    cout << "RE start: " << day[0] << "/" << mon[0] << "/" << year[0] << endl;
+    cout << "computer: " << t->tm_mday << "/" << 1 + t->tm_mon << "/" << 1900 + t->tm_year << endl;
+    cout << "RE end: " << day[1] << "/" << mon[1] << "/" << year[1] << endl;
 
-    if (1900 + t->tm_year<year[0] || 1900 + t->tm_year>year[1])
-        return false;
-    else if (1 + t->tm_mon<mon[0] || 1 + t->tm_mon>mon[1]) 
-        return false;
-    else if (t->tm_mday<day[0] || t->tm_mday>day[1])
-        return false;
-    else if (t->tm_hour<hour[0] || t->tm_hour>hour[1])
-        return false;
-    else if (t->tm_min<min[0] || t->tm_min>min[1])
-        return false;
-    else 
-        return true;
+    cout << endl;
+
+    cout << "RE start: " << hour[0] << ":" << min[0] << endl;
+    cout << "RE computer: " << 7 + t->tm_hour << ":" << t->tm_min << endl;
+    cout << "RE end: " << hour[1] << ":" << min[1] << endl;
+    if (1900 + t->tm_year<year[0] || 1900 + t->tm_year>year[1]) return false;
+    else if (1 + t->tm_mon<mon[0] || 1 + t->tm_mon>mon[1]) return false;
+    else if (t->tm_mday<day[0] || t->tm_mday>day[1]) return false;
+    else if (day[0] == t->tm_mday || day[1] == t->tm_mday) {
+        if (7 + t->tm_hour<hour[0] || 7 + t->tm_hour>hour[1]) return false;
+        else if (hour[0] == 7 + t->tm_hour || hour[1] == 7 + t->tm_hour) {
+            if (t->tm_min<min[0] || t->tm_min>min[1]) return false;
+        }
+    }
+    else return true; 
 }
 
 //3
@@ -1287,15 +1297,15 @@ void OperateTask(Sem srr[], student* Student, int i)
         {
         case 1:
         {
-           // if (checkRealTime(srr, i) == 1) {
+           if (checkRealTime(srr, i) == 1) {
                 system("CLS");
                 ViewAvailableCourse(srr[i], i);
                 EnrollCourse(srr[i], MyCourse, count, Student, fSoC);
-           /* }
+           }
             else {
-                cout << "Registration session has ended\n";
-               // system("pause");
-            }*/
+               cout << "Registration session has ended\n";
+               system("pause");
+            }
             break;
         }
         case 2:
@@ -1810,7 +1820,8 @@ void import_stu_mark()
             << current->finalmark << ","
             << current->othermark << ","
             << current->totalmark;
-        if (current->next) storage << endl;
+        if (current->next)
+            storage << endl;
         current = current->next;
     }
     storage.close();
@@ -1818,12 +1829,268 @@ void import_stu_mark()
     delete_linked_list(head);
 }
 
-//to be fixed
-void view_class_score() {
-    ifstream ifs;
-    ifs.open("test2.csv");
+void view_course_score() {
+    string course_name;
+    cout << "Enter the course you want to view score: ";
+    cin >> course_name;
+    ifstream f;
+    f.open(course_name + "_math.csv");
+    if (!f.is_open()) {
+        cout << "Class " << course_name << " has not published its scoreboard\n";
+        return;
+    }
+    cout << setw(2) << "No"
+        << setw(10) << "ID"
+        << setw(20) << "First name"
+        << setw(7) << "Last name"
+        << setw(14) << "Midterm mark"
+        << setw(12) << "Final mark"
+        << setw(12) << "Other mark"
+        << setw(12) << "Total mark\n";
+
+    char comma;
     string header;
-    getline(ifs, header);
+    student* temp = new student;
+    getline(f, header);
+    while (!f.eof()) {
+        f >> temp->no;
+        f >> comma;
+        f >> temp->id;
+        f >> comma;
+        getline(f, temp->firstname, ',');
+        getline(f, temp->lastname, ',');
+        getline(f, temp->gender, ',');
+        f >> temp->dob.day;
+        f >> comma;
+        f >> temp->dob.month;
+        f >> comma;
+        f >> temp->dob.year;
+        f >> comma;
+        getline(f, temp->socialid, ',');
+        f >> temp->midtermmark;
+        f >> comma;
+        f >> temp->finalmark;
+        f >> comma;
+        f >> temp->othermark;
+        f >> comma;
+        f >> temp->totalmark;
+
+        cout << setw(2) << temp->no << setw(10) << temp->id << setw(20) << temp->firstname
+            << setw(7) << temp->lastname << setw(14) << fixed << temp->midtermmark << setw(12)
+            << fixed << temp->finalmark << setw(12) << fixed << temp->othermark << setw(12)
+            << fixed << temp->totalmark << endl;
+    }
+    f.close();
+    delete temp;
+}
+//to be fixed
+void update_res() {
+    string course_name;
+    cout << "Enter the course you want to update: ";
+    cin >> course_name;
+    ifstream f;
+    f.open(course_name + "_math.csv");
+    student* temp_h = 0;
+    student* temp_c = 0;
+    char comma;
+    string str;
+    getline(f, str);
+    while (!f.eof()) {
+        if (!temp_h) {
+            temp_h = new student;
+            temp_c = temp_h;
+        }
+        else {
+            temp_c->next = new student;
+            temp_c = temp_c->next;
+        }
+
+        f >> temp_c->no;
+        f >> comma;
+        f >> temp_c->id;
+        f >> comma;
+        getline(f, temp_c->firstname, ',');
+        getline(f, temp_c->lastname, ',');
+        getline(f, temp_c->gender, ',');
+        f >> temp_c->dob.day;
+        f >> comma;
+        f >> temp_c->dob.month;
+        f >> comma;
+        f >> temp_c->dob.year;
+        f >> comma;
+        getline(f, temp_c->socialid, ',');
+        f >> temp_c->midtermmark;
+        f >> comma;
+        f >> temp_c->finalmark;
+        f >> comma;
+        f >> temp_c->othermark;
+        f >> comma;
+        f >> temp_c->totalmark;
+        getline(f, str);
+    }
+
+    temp_c = temp_h;
+    int temp_id;
+    cout << "Enter the ID of the student you want to update his/her results: ";
+    cin >> temp_id;
+    while (temp_c && temp_c->id != temp_id)
+        temp_c = temp_c->next;
+    if (!temp_c) {
+        cout << "The student you are looking for is not in this course\n";
+        return;
+    }
+        int option;
+        bool on = true;
+        do {
+            cout << "Which score do you want to adjust?\n"
+                << "1. Midterm mark\n"
+                << "2. Final mark\n"
+                << "3.Other mark\n"
+                << "4.Total mark\n";
+            cin >> option;
+            switch (option) {
+            case 1:
+                cout << "Enter the new result: ";
+                cin >> temp_c->midtermmark;
+                on = false;
+                break;
+            case 2:
+                cout << "Enter the new result: ";
+                cin >> temp_c->finalmark;
+                on = false;
+                break;
+            case 3:
+                cout << "Enter the new result: ";
+                cin >> temp_c->othermark;
+                on = false;
+                break;
+            case 4:
+                cout << "Enter the new result: ";
+                cin >> temp_c->totalmark;
+                on = false;
+                break;
+            default:
+                cout << "Invalid option. Please enter again\n";
+                system("pause");
+                break;
+            }
+        } while (on);
+
+        temp_c = temp_h;
+        ofstream storage;
+        storage.open(str + "_math.csv");
+        storage << "No" << "," << "Student ID" << ',' << "First Name" << "," << "Last Name" << "," << "Gender" << ", " << "Date of Birth" << ", " << "Social ID" << "," << "Midterm Mark" << "," << "Final Mark" << "," << "Other Mark" << "," << "Total Mark" << endl;
+        while (temp_c != nullptr)
+        {
+            storage << temp_c->no << ","
+                << temp_c->id << ","
+                << temp_c->firstname << ","
+                << temp_c->lastname << ","
+                << temp_c->gender << ","
+                << temp_c->dob.day << "/" << temp_c->dob.month << "/" << temp_c->dob.year << ","
+                << temp_c->socialid << ","
+                << temp_c->midtermmark << ","
+                << temp_c->finalmark << ","
+                << temp_c->othermark << ","
+                << temp_c->totalmark;
+            if (temp_c->next)
+                storage << endl;
+            temp_c = temp_c->next;
+        }
+        storage.close();
+
+        delete_linked_list(temp_h);
+
+}
+
+void view_class_score() {
+    string class_name;
+    cout << "Enter the class you want to view score: ";
+    cin >> class_name;
+    ifstream f;
+    f.open(class_name + ".csv");
+    if (!f.is_open()) {
+        cout << "Class " << class_name << "does not exist\n";
+        return;
+    }
+    string str;
+    getline(f, str);
+    int t;
+    char comma;
+    int gpa = 0;
+    int count_sub = 0;
+    student* temp = new student;
+    while (!f.eof()) {
+        f >> t;
+        f >> comma;
+        f >> temp->id;
+        getline(f, str);
+
+        ifstream ID_Courses_ifs;
+        ID_Courses_ifs.open(to_string(temp->id) + "_Courses.txt");
+        if (!ID_Courses_ifs.is_open())
+            continue;
+        int count;
+        string Course_name;
+        ID_Courses_ifs >> count;
+        while (count != 0) {
+            ID_Courses_ifs >> t;
+            ID_Courses_ifs >> str;
+            ID_Courses_ifs >> Course_name;
+            ifstream math_ifs;
+            math_ifs.open(str + "_math.csv");
+            if (math_ifs.is_open()) {
+                student* temp2 = new student;
+                temp2->id = 0;
+                while (temp2->id != temp->id || !math_ifs.eof()) {
+                    getline(math_ifs, str);
+                    math_ifs >> temp2->no;
+                    math_ifs >> comma;
+                    math_ifs >> temp2->id;
+                }
+                if (temp2->id == temp->id) {
+                    math_ifs >> comma;
+                    getline(math_ifs, temp2->firstname, ',');
+                    getline(math_ifs, temp2->lastname, ',');
+                    getline(math_ifs, temp2->gender, ',');
+                    math_ifs >> temp2->dob.day;
+                    math_ifs >> comma;
+                    math_ifs >> temp2->dob.month;
+                    math_ifs >> comma;
+                    math_ifs >> temp2->dob.year;
+                    math_ifs >> comma;
+                    getline(math_ifs, temp2->socialid, ',');
+                    math_ifs >> temp2->midtermmark;
+                    math_ifs >> comma;
+                    math_ifs >> temp2->finalmark;
+                    math_ifs >> comma;
+                    math_ifs >> temp2->othermark;
+                    math_ifs >> comma;
+                    math_ifs >> temp2->totalmark;
+                    gpa += temp2->totalmark;
+                    if (count_sub == 0)
+                        cout << temp->id << endl;
+                    cout << Course_name << ": " << temp2->finalmark << endl;
+                    count_sub++;
+                }
+            }
+            ID_Courses_ifs >> str;
+            ID_Courses_ifs >> t;
+            ID_Courses_ifs >> t;
+            ID_Courses_ifs >> str;
+            ID_Courses_ifs >> t;
+            ID_Courses_ifs >> str;
+            ID_Courses_ifs >> t;
+            count--;
+        }
+    }
+    cout << "GPA this semester: " << gpa / float(count_sub) << endl;/*
+    int count;
+    f >> count;
+    Course* temp = new Course;
+    while (count != 0) {
+
+    }
     int comma = 0;
     cout << setfill(' ');
 
@@ -1927,12 +2194,12 @@ void view_class_score() {
         head = head->next;
         delete cur;
         cur = head;
-    }
+    }*/
 }
-
+//to be fixed
 void view_owner_score(student* Student) {
     ifstream ifs;
-    ifs.open("test2.csv");
+    ifs.open(to_string(Student->id)+"_Courses.txt");
     string header;
     getline(ifs, header);
     int comma = 0;

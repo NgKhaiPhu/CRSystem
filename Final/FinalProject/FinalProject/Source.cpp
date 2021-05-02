@@ -77,7 +77,7 @@ int main() {
 					break; 
 				}
 				case 6:
-					menuScore();
+					//menuScore();
 					break;
 				default:
 					cout << "Invalid option. Please enter again\n";

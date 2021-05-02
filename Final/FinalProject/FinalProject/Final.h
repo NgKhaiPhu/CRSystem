@@ -134,6 +134,7 @@ void load_stu_course_class(student*& head, string* classs);
 void export_student_in_courses(student* head, string* classs);
 void delete_linked_list(student*& head);
 void import_stu_mark();
+void view_course_score();
 void view_class_score();
 void view_owner_score();
 void menuScore();
