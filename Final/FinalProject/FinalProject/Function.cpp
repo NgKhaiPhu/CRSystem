@@ -64,28 +64,29 @@ void login(student* stuAcc, staff* staAcc, student*& stuCur, staff*& staCur, boo
 	do {
 		stuCur = stuAcc;
 		staCur = staAcc;
-		cout << "\nUsername: ";
+		cout << "\nUsername (Press 0 to exit): ";
 		cin >> u;
-		cout << "Password: ";
-		cin >> p;
-        if (p == "0") {
+        if (u == "0") {
             exit = true;
             return;
         }
-		while (stuCur && stuCur->id != stoi(u))
+		cout << "Password: ";
+		cin >> p;
+        
+		while (stuCur && to_string(stuCur->id) != u)
 			stuCur = stuCur->next;
-        if (stuCur->id == stoi(u) && stuCur->password != p) 
-            cout << "Wrong password\n";
-		else if (!stuCur) {
-			while (staCur && staCur->username != u)
-				staCur = staCur->next;
+        if (!stuCur) {
+            while (staCur && staCur->username != u)
+                staCur = staCur->next;
             if (!stuCur && !staCur)
                 cout << "Account does not exist\n";
             else if (staCur->password != p)
                 cout << "Wrong password\n";
             else
                 logged = true;
-		}
+        }
+        else if (to_string(stuCur->id) == u && stuCur->password != p)
+            cout << "Wrong password\n";
         else {
             staCur = 0;
             logged = true;
@@ -356,8 +357,6 @@ void create_courselist(Sem srr[], int& i, int& year) {
         for (int j = 0; j < 2; j++) {
             cout << "\t\t\tDay " << j + 1 << ": ";
             getline(cin, srr[i].cur->day[j]);
-        }
-        for (int j = 0; j < 2; j++) {
             cout << "\t\t\tS" << j + 1 << ": ";
             getline(cin, srr[i].cur->s[j]);
         }
@@ -399,6 +398,7 @@ void displayCourseList(Sem srr[], int i, int year)//4
         srr[i].cur = srr[i].cur->next;
     }
     cout << endl;
+    system("pause");
 }
 
 void deleteCourse(Sem srr[]) {
@@ -478,12 +478,12 @@ void updateCourse(Sem srr[]) {
             cout << "\t\t\tnew ID: "; cin >> srr[n].cur->CoId;
             break;
         case 2: 
-            cout << "\t\t\tnew NameCourse: "; 
+            cout << "\t\t\tnew Course name: "; 
             cin.ignore(32767, '\n');
             getline(cin, srr[n].cur->CoName);
             break;
         case 3: 
-            cout << "\t\t\tnew Lecture: "; 
+            cout << "\t\t\tnew Lecturer: "; 
             cin.ignore(32767, '\n');
             getline(cin, srr[n].cur->CoName);
             break;
@@ -492,7 +492,7 @@ void updateCourse(Sem srr[]) {
             cin >> srr[n].cur->credit;
             break;
         case 5: 
-            cout << "\t\t\tnew MaxStudent: "; 
+            cout << "\t\t\tnew Max Student: "; 
             cin >> srr[n].cur->maxSt;
             break;
         case 6: 
@@ -592,7 +592,7 @@ void write_data_course(Sem srr[], int i, int year) {
 }
 
 int checkRealTime(Sem srr[], int i) {
-    if (!i) {
+    if (i!=0 && i!=2 && i!=1) {
         cout << "Course unavailable" << endl;
         return false;
     }
@@ -612,15 +612,11 @@ int checkRealTime(Sem srr[], int i) {
     if (isInSem(SeStart, SeEnd, t, day, mon, year)) {
         if (isInRe(ReStart, ReEnd, t, day, mon, year, hour, min)) 
             res = 1;
-        else {
-            cout << "Enroll session has ended!" << endl;
+        else 
             res = 2;
-        }
     } 
-    else {
-        cout << "\t\t\tSemester has ended!" << endl;
+    else 
         res = 3;
-    }
 
     delete[]day;
     delete[]mon;
@@ -846,20 +842,21 @@ bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, 
 }
 
 //3
-void InputMyCourse(fstream& f, Course*& MyCo, int& n, student* Student)
+void InputMyCourse(Course*& MyCo, int& n, student* Student)
 {
     fstream fSoC;
     string filename;
+    ifstream f;
     filename = to_string(Student->id) + "_Courses.txt";
-    f.open(filename, fstream::in);
+    f.open(filename, ifstream::in);
     f >> n;
-    Course* pcur = MyCo;
-    if (f.fail())
+    Course* pcur = 0;
+    if (!f.is_open())
     {
         cout << "Can't open Student's Courses file.\n";
         return;
     }
-    while (!f.eof())
+    while (!f.eof() && n != 0)
     {
         if (MyCo == nullptr)
         {
@@ -873,8 +870,10 @@ void InputMyCourse(fstream& f, Course*& MyCo, int& n, student* Student)
         }
         f >> pcur->no;
         f >> pcur->CoId;
-        f >> pcur->CoName;
-        f >> pcur->teacherName;
+        string space;
+        getline(f, space);
+        getline(f, pcur->CoName);
+        getline(f, pcur->teacherName);
         f >> pcur->credit;
         f >> pcur->maxSt;
         f >> pcur->day[0];
@@ -885,81 +884,8 @@ void InputMyCourse(fstream& f, Course*& MyCo, int& n, student* Student)
 
         filename = pcur->CoId + ".txt";
         fSoC.open(filename, fstream::in);
-        pcur->SofC = nullptr;
-        f >> pcur->SofC->StuEnroll;
-        student* ptmp;
-        while (!fSoC.eof())
-        {
-            if (pcur->SofC->Stu == nullptr)
-            {
-                pcur->SofC->Stu = new student;
-                ptmp = pcur->SofC->Stu;
-            }
-            else
-            {
-                ptmp->next = new student;
-                ptmp = ptmp->next;
-            }
-            fSoC >> ptmp->no;
-            fSoC >> ptmp->id;
-            fSoC >> ptmp->firstname;
-            fSoC >> ptmp->lastname;
-            fSoC >> ptmp->gender;
-            fSoC >> ptmp->dob.day;
-            fSoC >> ptmp->dob.month;
-            fSoC >> ptmp->dob.year;
-            fSoC >> ptmp->socialid;
-            ptmp->next = nullptr;
-        }
-        pcur->next = nullptr;
-
-        fSoC.close();
-    }
-    f.close();
-}
-
-void InputAvailCourse(Sem& S, Course* MyCo)
-{
-    fstream f, fSoC;
-    f.open("CourseList.txt", fstream::in);
-    string filename;
-
-    int t;
-    Course* pcur = nullptr;
-    f >> t;
-    f >> S.year;
-    f >> S.regisStart;
-    f >> S.regisEnd;
-    f >> S.SemStart;
-    f >> S.SemEnd;
-    f >> t;
-    while (t != 0)
-    {
-        if (S.head == nullptr)
-        {
-            S.head = new Course;
-            pcur = S.head;
-        }
-        else
-        {
-            pcur->next = new Course;
-            pcur = pcur->next;
-        }
-        pcur->no = t;
-        f >> pcur->CoId;
-        f >> pcur->CoName;
-        f >> pcur->teacherName;
-        f >> pcur->credit;
-        f >> pcur->maxSt;
-        f >> pcur->day[0];
-        f >> pcur->s[0];
-        f >> pcur->day[1];
-        f >> pcur->s[1];
-
-        filename = pcur->CoId + ".txt";
-        fSoC.open(filename, fstream::in);
-        pcur->SofC = 0;
-        f >> pcur->SofC->StuEnroll;
+        pcur->SofC = new StuofCourse;
+        fSoC >> pcur->SofC->StuEnroll;
         student* ptmp = 0;
         while (!fSoC.eof())
         {
@@ -973,24 +899,104 @@ void InputAvailCourse(Sem& S, Course* MyCo)
                 ptmp->next = new student;
                 ptmp = ptmp->next;
             }
-            fSoC >> ptmp->no;
             fSoC >> ptmp->id;
-            fSoC >> ptmp->firstname;
-            fSoC >> ptmp->lastname;
-            fSoC >> ptmp->gender;
+            string space;
+            getline(fSoC, space);
+            getline(fSoC, ptmp->firstname);
+            getline(fSoC, ptmp->gender);
             fSoC >> ptmp->dob.day;
             fSoC >> ptmp->dob.month;
             fSoC >> ptmp->dob.year;
-            fSoC >> ptmp->socialid;
             ptmp->next = nullptr;
         }
         pcur->next = nullptr;
-        f >> t;
+
         fSoC.close();
     }
-    while (MyCo->next != nullptr)
+    f.close();
+}
+
+void InputAvailCourse(Sem srr[], Course* MyCo, int& i)
+{
+    fstream f, fSoC;
+    f.open("CourseList.txt", fstream::in);
+    string filename;
+
+    int t;
+    Course* pcur = nullptr;
+    f >> i;
+    i--;
+    f >> srr[i].SemStart;
+    f >> srr[i].SemEnd;
+    f >> srr[i].regisStart;
+    f >> srr[i].regisEnd;
+    f >> t;
+    while (t != 0)
     {
-        RemoveAlreadyCourses(S.head, MyCo->no);
+        if (srr[i].head == nullptr)
+        {
+            srr[i].head = new Course;
+            pcur = srr[i].head;
+        }
+        else
+        {
+            pcur->next = new Course;
+            pcur = pcur->next;
+        }
+        pcur->no = t;
+        f >> pcur->CoId;
+        string space;
+        getline(f, space);
+        getline(f, pcur->CoName);
+        getline(f, pcur->teacherName);
+        f >> pcur->credit;
+        f >> pcur->maxSt;
+        f >> pcur->day[0];
+        f >> pcur->day[1];
+        f >> pcur->s[0];
+        f >> pcur->s[1];
+
+        filename = pcur->CoId + ".txt";
+        fSoC.open(filename, fstream::in);
+        if (!fSoC.is_open())
+            return;
+        pcur->SofC = new StuofCourse;
+        fSoC >> pcur->SofC->StuEnroll;
+        if (pcur->SofC->StuEnroll != 0) {
+            student* ptmp = 0;
+            while (!fSoC.eof())
+            {
+                if (pcur->SofC->Stu == nullptr)
+                {
+                    pcur->SofC->Stu = new student;
+                    ptmp = pcur->SofC->Stu;
+                }
+                else
+                {
+                    ptmp->next = new student;
+                    ptmp = ptmp->next;
+                }
+                fSoC >> ptmp->id;
+                string space;
+                getline(fSoC, space);
+                getline(fSoC, ptmp->firstname);
+                getline(fSoC, ptmp->gender);
+                fSoC >> ptmp->dob.day;
+                fSoC >> ptmp->dob.month;
+                fSoC >> ptmp->dob.year;
+                ptmp->next = nullptr;
+            }
+            pcur->next = nullptr;
+        }
+        else
+            pcur->SofC = 0;
+       
+        fSoC.close();
+        f >> t;
+    }
+    while (MyCo)
+    {
+        RemoveAlreadyCourses(srr[i].head, MyCo->no);
         MyCo = MyCo->next;
     }
     f.close();
@@ -1062,19 +1068,22 @@ void EnrollCourse(Sem S, Course*& MyCourse, int& count, student* Student, fstrea
     AddStutoCourse(pC, Student);
     StoreStusofCourse(pC, fSoC);
     count++;
+    StoreCoursesofStu(MyCourse, count, Student);
 }
 
 void AddStutoCourse(Course*& MyCo, student* Student)
 {
-    student* pCur = MyCo->SofC->Stu;
+    student* pCur = 0;
     if (MyCo->SofC == nullptr)
     {
+        MyCo->SofC = new StuofCourse;
         MyCo->SofC->Stu = new student;
         pCur = MyCo->SofC->Stu;
     }
     else
     {
-        while (pCur->next != nullptr)	pCur = pCur->next;
+        while (pCur->next != nullptr)
+            pCur = pCur->next;
         pCur->next = new student;
         pCur = pCur->next;
     }
@@ -1117,7 +1126,7 @@ void ViewAvailableCourse(Sem S, int i)
         cout << setw(8) << pC->maxSt;
         cout << setw(10) << pC->day[0];
         cout << setw(8) << pC->s[0];
-        cout << endl << setw(65) << pC->day[1];
+        cout << endl << setw(75) << pC->day[1];
         cout << setw(8) << pC->s[1];
         pC = pC->next;
     }
@@ -1146,7 +1155,7 @@ void RemoveAlreadyCourses(Course*& pHead, int k)
 void ViewMyCourse(Sem S, int i, Course* MyCo)
 {
     cout << setfill(' ');
-    cout << "Course List of semester " << i << " in " << S.year << " , beginning from ";
+    cout << "Course List of semester " << i+1 << " in " << S.year << " , beginning from ";
     cout << S.SemStart << " to " << S.SemEnd << endl;
     cout << "==========================================================================================" << endl;
     cout << "Registration time starts from " << S.regisStart << " to " << S.regisEnd << endl;
@@ -1171,10 +1180,11 @@ void ViewMyCourse(Sem S, int i, Course* MyCo)
         cout << setw(8) << pC->maxSt;
         cout << setw(10) << pC->day[0];
         cout << setw(8) << pC->s[0];
-        cout << endl << setw(65) << pC->day[1];
+        cout << endl << setw(75) << pC->day[1];
         cout << setw(8) << pC->s[1];
         pC = pC->next;
     }
+    system("pause");
 }
 
 void DeleteCourse(Sem& S, Course*& MyCo, int& count, student* Student, fstream& fSoC){
@@ -1197,6 +1207,7 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count, student* Student, fstream& 
         pCur = pCur->next;
 
     RemoveStuofCo(pCur, Student);
+    pCur->SofC->StuEnroll--;
     StoreStusofCourse(pCur, fSoC);
 
     if (S.head == nullptr)
@@ -1224,6 +1235,7 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count, student* Student, fstream& 
     }
     pCur->next = nullptr;
     count--;
+    StoreCoursesofStu(MyCo, count, Student);
 }
 
 void RemoveStuofCo(Course*& MyCo, student* Student)
@@ -1246,19 +1258,17 @@ void RemoveStuofCo(Course*& MyCo, student* Student)
         }
         pCur = pCur->next;
     }
-
-    MyCo->SofC->StuEnroll--;
 }
 
 void OperateTask(Sem srr[], student* Student, int i)
 {
     //preps
     int count = 0;
-    Course* MyCourse;
-    fstream fstu, fSoC;
+    Course* MyCourse = 0;
+    fstream fSoC;
 
-    InputMyCourse(fstu, MyCourse, count, Student);
-    InputAvailCourse(srr[i], MyCourse);
+    InputMyCourse(MyCourse, count, Student);
+    InputAvailCourse(srr, MyCourse,i);
 
     int option = 1;
     bool on = true;
@@ -1277,33 +1287,45 @@ void OperateTask(Sem srr[], student* Student, int i)
         {
         case 1:
         {
-            if (checkRealTime(srr, i) == 1) {
+           // if (checkRealTime(srr, i) == 1) {
                 system("CLS");
                 ViewAvailableCourse(srr[i], i);
                 EnrollCourse(srr[i], MyCourse, count, Student, fSoC);
-            }
-            else
+           /* }
+            else {
                 cout << "Registration session has ended\n";
+               // system("pause");
+            }*/
             break;
         }
         case 2:
         {
-            if (checkRealTime(srr, i) == 1) {
+            //if (count != 0) {
+            // if (checkRealTime(srr, i) == 1) {
                 system("CLS");
                 ViewMyCourse(srr[i], i, MyCourse);
                 DeleteCourse(srr[i], MyCourse, count, Student, fSoC);
+           /* }
+            else {
+                cout << "Registration session has ended\n";
+
             }
             else
-                cout << "Registration session has ended\n";
+                cout << "You have not enrolled any course\n";*/
+            system("pause");
             break;
         }
         case 3:
         {
             system("CLS");
-            if (checkRealTime(srr, i) == 1)
-                ViewMyCourse(srr[i], i, MyCourse);
+            if (count != 0) 
+                /* if (checkRealTime(srr, i) == 1)
+                     ViewMyCourse(srr[i], i, MyCourse);
+                 else*/
+                ViewMyCourseAfterRegistrationOver(MyCourse, i);
             else
-                ViewMyCourseAfterRegistrationOver(srr, i);
+                cout << "You have not enrolled any course\n";
+            system("pause");
             break;
         }
         case 4:
@@ -1314,13 +1336,6 @@ void OperateTask(Sem srr[], student* Student, int i)
             system("pause");
             break;
         }
-    }
-
-    Course* cur = MyCourse;
-    while (MyCourse->next) {
-        MyCourse = MyCourse->next;
-        delete cur;
-        cur = MyCourse;
     }
 }
 
@@ -1352,17 +1367,18 @@ void DeleteList(Course*& MyCo, Sem& S)
     }
 }
 
-void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, student* Student)
+void StoreCoursesofStu(Course* MyCourse, int count, student* Student)
 {
     string filename;
     filename = to_string(Student->id) + "_Courses.txt";
+    ofstream f;
     f.open(filename, fstream::out);
-    if (f.fail())
+    if (!f.is_open())
     {
         cout << "Can't open the Student's Courses file.\n";
         return;
     }
-    f << count;
+    f << count << endl;
     while (count != 0)
     {
         f << MyCourse->no << endl;
@@ -1386,39 +1402,35 @@ void StoreStusofCourse(Course* MyCourse, fstream& f)
     string filename;
     filename = MyCourse->CoId + ".txt";
     f.open(filename, fstream::out);
-    if (f.fail())
+    if (!f.is_open())
     {
         cout << "Can't open the Student's Courses file.\n";
         return;
     }
-    f << MyCourse->SofC->StuEnroll;
+    f << MyCourse->SofC->StuEnroll << endl;
     int count = MyCourse->SofC->StuEnroll;
     student* pCur = MyCourse->SofC->Stu;
     while (count != 0)
     {
-        f << pCur->id << " ";
-        f << pCur->firstname << " ";
-        f << pCur->lastname << " ";
-        f << pCur->gender << " ";
-        f << pCur->dob.day << " ";
-        f << pCur->dob.month << " ";
-        f << pCur->dob.year << " ";
-        f << pCur->socialid << " ";
+        f << pCur->id << endl;
+        f << pCur->firstname << endl;
+        f << pCur->gender << endl;
+        f << pCur->dob.day << endl;
+        f << pCur->dob.month << endl;
+        f << pCur->dob.year << endl;
         count--;
-        f << endl;
         pCur = pCur->next;
     }
     f.close();
 }
 
 //4
-void ViewMyCourseAfterRegistrationOver(Sem srr[], int i)
+void ViewMyCourseAfterRegistrationOver(Course* MyCo, int i)
 {
-    srr[i].cur = srr[i].head;
+    Course* cur = MyCo;
     cout << setfill(' ');
-    cout << "Course List of semester " << i + 1 << " in " << srr[i].year << " , beginning from ";
-    cout << srr[i].SemStart << " to " << srr[i].SemEnd << endl;
-    cout << "==========================================================================================" << endl;
+    cout << "Your course for this semester " << endl;
+    cout << "==============================" << endl;
     cout << setw(5) << "ID";
     cout << setw(15) << "Name";
     cout << setw(15) << "Lecturer";
@@ -1426,20 +1438,21 @@ void ViewMyCourseAfterRegistrationOver(Sem srr[], int i)
     cout << setw(5) << "Maximum";
     cout << setw(15) << "Day";
     cout << setw(15) << "Session";
-    while (srr[i].cur != nullptr) 
+    while (cur != nullptr) 
         {
         cout << endl;
-        cout << setw(5) << srr[i].cur->CoId;
-        cout << setw(15) << srr[i].cur->CoName;
-        cout << setw(15) << srr[i].cur->teacherName;
-        cout << setw(5) << srr[i].cur->credit;
-        cout << setw(5) << srr[i].cur->maxSt;
-        cout << setw(15) << srr[i].cur->day[0];
-        cout << setw(15) << srr[i].cur->s[0];
-        cout << endl << setw(89) << srr[i].cur->day[1];
-        cout << endl << setw(15) << srr[i].cur->s[1];
-        srr[i].cur = srr[i].cur->next;
+        cout << setw(5) << cur->CoId;
+        cout << setw(15) << cur->CoName;
+        cout << setw(15) << cur->teacherName;
+        cout << setw(5) << cur->credit;
+        cout << setw(5) << cur->maxSt;
+        cout << setw(15) << cur->day[0];
+        cout << setw(15) << cur->s[0];
+        cout << endl << setw(89) << cur->day[1];
+        cout << endl << setw(15) << cur->s[1];
+        cur = cur->next;
     }
+    system("pause");
 }
 
 //5
@@ -1619,7 +1632,7 @@ void export_student_in_courses(student* head, string* classs)
     output.close();
 }
 
-string choose_class()
+string choose_class()//util
 {
     course_class* head = nullptr;
     course_class* current = nullptr;
@@ -1655,8 +1668,11 @@ string choose_class()
 
     current = head;
 
-    int key = 0; cout << "Enter your option:"; cin >> key;
-    for (int i = 1; i < key; i++) current = current->next;
+    int key = 0; 
+    cout << "Enter your option:";
+    cin >> key;
+    for (int i = 1; i < key; i++) 
+        current = current->next;
     string a(current->data.begin(), current->data.end());
 
     return a;
@@ -1667,7 +1683,8 @@ void load_stu_course_class(student*& head, string* classs)
 {
     fstream data;
     data.open((*classs + ".csv").c_str(), fstream::in);
-    if (!data.is_open()) return;
+    if (!data.is_open()) 
+        return;
 
     data.ignore(1000, '\n');
     char temp;
@@ -1736,8 +1753,10 @@ void import_stu_mark()
     {
         student* add = new student;
         import >> add->no;
-        if (add->no < 0)break; import >> tempp;
-        import >> add->id; import >> tempp;
+        if (add->no < 0)break; 
+        import >> tempp;
+        import >> add->id;
+        import >> tempp;
         getline(import, add->firstname, ',');
         getline(import, add->lastname, ',');
         getline(import, add->gender, ',');
@@ -1753,7 +1772,7 @@ void import_stu_mark()
         import >> tempp;
         import >> add->finalmark;
         import >> tempp;
-        import >> add->orthermark; 
+        import >> add->othermark; 
         import >> tempp;
         import >> add->totalmark;
         import.ignore();
@@ -1789,7 +1808,7 @@ void import_stu_mark()
             << current->socialid << ","
             << current->midtermmark << ","
             << current->finalmark << ","
-            << current->orthermark << ","
+            << current->othermark << ","
             << current->totalmark;
         if (current->next) storage << endl;
         current = current->next;
@@ -1799,6 +1818,7 @@ void import_stu_mark()
     delete_linked_list(head);
 }
 
+//to be fixed
 void view_class_score() {
     ifstream ifs;
     ifs.open("test2.csv");
@@ -2018,4 +2038,39 @@ void view_owner_score(student* Student) {
         delete cur;
         cur = head;
     }
+}
+
+void menuScore() {
+    int option;
+    bool on = true;
+    do {
+        system("CLS");
+        cout << "Select what you want to do: \n"
+            << "1. View scoreboard of a course\n"
+            << "2. View scoreboard of a class\n"
+            << "3. Update a student result\n"
+            << "4. Exit Score\n";
+        cin >> option;
+        switch (option) {
+        case 1:
+            system("CLS");
+            //Thinh dang lam
+            break;
+        case 2:
+            system("CLS");
+            view_class_score();
+            break;
+        case 3:
+            system("CLS");
+            //Thinh dang lam
+            break;
+        case 4:
+            on = false;
+            break;
+        default:
+            cout << "Invalid option. Please enter again\n";
+            system("pause");
+            break;
+        }
+    } while (on);
 }

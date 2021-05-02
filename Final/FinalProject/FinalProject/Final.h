@@ -30,7 +30,7 @@ struct student
 	float totalmark;
 	float finalmark;
 	float midtermmark;
-	float orthermark;
+	float othermark;
 	const int type = 0;
 	string socialid;
 	student* next = 0;
@@ -49,8 +49,8 @@ struct staff
 
 struct StuofCourse
 {
-	int StuEnroll;//num of Students enrolling to course right now;
-	student *Stu;
+	int StuEnroll = 0;//num of Students enrolling to course right now;
+	student* Stu = 0;
 };
 
 struct Course {
@@ -105,8 +105,8 @@ bool isInRe(string ReStart, string ReEnd, tm* t, int* day, int* mon, int* year, 
 void write_data_course(Sem srr[], int i, int year);
 
 //3
-void InputMyCourse(fstream& f, Course*& MyCo, int& n, student* Student);
-void InputAvailCourse(Sem& S, Course* MyCo);
+void InputMyCourse(Course*& MyCo, int& n, student* Student);
+void InputAvailCourse(Sem srr[], Course* MyCo, int& i);
 void EnrollCourse(Sem S, Course*& MyCourse, int& count, student* Student, fstream& fSoC); // S la hoc ki voi cac course dc staff nhap vao
 void AddStutoCourse(Course*& MyCo, student* Student);
 void ViewAvailableCourse(Sem S, int i);
@@ -116,11 +116,11 @@ void DeleteCourse(Sem& S, Course*& MyCo, int& count, student *Student, fstream& 
 void RemoveStuofCo(Course*& MyCo, student* Student);
 void OperateTask(Sem srr[], student* Student, int i);
 void DeleteList(Course*& MyCo, Sem& S);
-void StoreCoursesofStu(Course* MyCourse, fstream& f, int count, student* Student);
+void StoreCoursesofStu(Course* MyCourse, int count, student* Student);
 void StoreStusofCourse(Course* MyCourse, fstream& f);
 
 //4 
-void ViewMyCourseAfterRegistrationOver(Sem srr[], int i);
+void ViewMyCourseAfterRegistrationOver(Course* MyCo, int i);
 
 //5
 void menuView(Sem srr[], int i, int year);
@@ -136,5 +136,6 @@ void delete_linked_list(student*& head);
 void import_stu_mark();
 void view_class_score();
 void view_owner_score();
+void menuScore();
 
 #endif

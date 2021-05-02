@@ -17,7 +17,7 @@ int main() {
 
 	//login
 	bool exit = false;
-	int year = 0, i = 0;
+	int year = 0, i = 1;
 	Sem* srr = new Sem[3];
 
 	do {
@@ -28,6 +28,8 @@ int main() {
 			<< "COURSE REGISTRATION SYSTEM\n"
 			<< "--------------------------";
 		login(stuAcc, staAcc, stuUsing, staUsing, exit);
+		if (exit)
+			continue;
 
 		int opt;
 		bool logout = false;
@@ -41,7 +43,8 @@ int main() {
 					<< setw(6) << " " << "2 to create a new class\n"
 					<< setw(6) << " " << "3 to go to Course\n"
 					<< setw(6) << " " << "4 to go to View\n"
-					<< setw(6) << " " << "5 to export list of student from a course\n";					
+					<< setw(6) << " " << "5 to export list of student from a course\n"
+					<< setw(6) << " " << "6 to go to Score\n";
 				cin >> opt;
 				switch (opt) {
 				case 0:
@@ -55,7 +58,8 @@ int main() {
 					system("CLS");
 					student* list = 0;
 					create_class(list);
-					break; }
+					break;
+				}
 				case 3:
 					TCmenu(srr, i, year);
 					break;
@@ -72,6 +76,9 @@ int main() {
 					import_stu_mark();
 					break; 
 				}
+				case 6:
+					menuScore();
+					break;
 				default:
 					cout << "Invalid option. Please enter again\n";
 					system("pause");
@@ -96,9 +103,12 @@ int main() {
 				case 0:
 					logout = true;
 					break;
-				case 1: 
+				case 1: {
+					delete[]srr;
+					Sem* srr = new Sem[3];
+
 					OperateTask(srr, stuUsing, i);
-						break; 
+					break; }
 				case 2:
 					//mai lam, phan cua Thinh
 					break;
@@ -126,7 +136,6 @@ int main() {
 		stacur = staAcc;
 	}
 
-	delete[]srr;
 
 	return 0;
 }
