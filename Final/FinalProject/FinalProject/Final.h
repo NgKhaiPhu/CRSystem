@@ -135,8 +135,9 @@ void export_student_in_courses(student* head, string* classs);
 void delete_linked_list(student*& head);
 void import_stu_mark();
 void view_course_score();
+void update_res();
 void view_class_score();
-void view_owner_score();
+void view_owner_score(student* Student);
 void menuScore();
 
 #endif

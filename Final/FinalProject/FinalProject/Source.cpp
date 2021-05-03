@@ -1,10 +1,13 @@
 #include "Final.h"
 
 //mai hoan thanh, them clearscr
-int main() {
+	int main() {
 	//inputAcc
 	fstream acc;
-	acc.open("testLogin.csv", fstream::in);
+	string acc_input;
+	cout << "Input account, enter address file: ";
+	cin >> acc_input;
+	acc.open(acc_input, fstream::in);
 	if (!acc.is_open()) {
 		cout << "Cannot open account file\n";
 		return 0;
@@ -43,8 +46,9 @@ int main() {
 					<< setw(6) << " " << "2 to create a new class\n"
 					<< setw(6) << " " << "3 to go to Course\n"
 					<< setw(6) << " " << "4 to go to View\n"
-					<< setw(6) << " " << "5 to export list of student from a course\n"
-					<< setw(6) << " " << "6 to go to Score\n";
+					<< setw(6) << " " << "5 to export list of students from a course\n"
+					<< setw(6) << " " << "6 to import student's results\n"
+					<< setw(6) << " " << "7 to go to Score\n";
 				cin >> opt;
 				switch (opt) {
 				case 0:
@@ -67,17 +71,21 @@ int main() {
 					menuView(srr, i, year);
 					break;
 				case 5: 
-				{
+				{			
+					system("CLS");
 					student* head = nullptr;
 					string classs = choose_class();// Chon lop de export file
 					system("CLS");
 					load_stu_course_class(head, &classs);
 					export_student_in_courses(head, &classs);
-					import_stu_mark();
 					break; 
 				}
 				case 6:
-					//menuScore();
+					system("CLS");
+					import_stu_mark();
+					break;
+				case 7:
+					menuScore();
 					break;
 				default:
 					cout << "Invalid option. Please enter again\n";
@@ -108,9 +116,11 @@ int main() {
 					Sem* srr = new Sem[3];
 
 					OperateTask(srr, stuUsing, i);
-					break; }
+					break; 
+				}
 				case 2:
-					//mai lam, phan cua Thinh
+					system("CLS");
+					view_owner_score(stuUsing);
 					break;
 				default:
 					cout << "Invalid option. Please enter again\n";
